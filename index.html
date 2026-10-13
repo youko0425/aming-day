@@ -159,19 +159,13 @@ button{font-family:inherit;cursor:pointer}
   </div>
   <div id="order" class="card panel hide">
     <div style="color:var(--cyan)">咩噗茶飲．店員</div>
-    <div class="big" id="oline">請大聲說出你要的飲料</div>
-    <div id="omic">
-      <div>對著麥克風大聲喊：<b style="color:var(--orange)">QQㄋㄟㄋㄟ好喝到咩噗茶</b></div>
-      <div class="bar"><i id="vol"></i></div>
-      <div id="heard" style="min-height:26px;opacity:.8"></div>
-    </div>
-    <div id="ocard" class="hide">
-      <div>依照正確順序點選字卡</div>
+    <div class="big" id="oline">你好，請問要點什麼？</div>
+    <div id="ocard">
+      <div id="ohint">依照正確順序點選字卡</div>
       <div id="pick"></div>
       <div class="cards" id="cards"></div>
     </div>
     <div class="bar"><i id="otime" style="background:var(--orange)"></i></div>
-    <button class="btn2" id="tocard">改用字卡</button>
   </div>
   <div id="chen" class="card panel hide">
     <div style="color:var(--cyan)">陳媽媽家．第 <span id="cround">1</span> 回合</div>
@@ -1266,9 +1260,9 @@ const chenVisitor = person({shirt:0x8a3a6a, hair:0x3a2420, pants:0x3a3a4a}); che
 
 // ---------- 任務與地點 ----------
 const TASKS = [
-  {key:'egg', label:'便利商店：茶葉蛋', door:[-46,10.5], cp:[-46,9.2, Math.PI/2], wp:[[-60,13],[-46,10]]},
-  {key:'soy', label:'超市：醬油', door:[16,10.5], cp:[16,9.2, Math.PI/2], wp:[[-22,10],[-22,37],[4,37],[4,10],[16,10]]},
-  {key:'tea', label:'飲料店：QQㄋㄟㄋㄟ好喝到咩噗茶', door:[65,-42.6], cp:[66,-41, 0], wp:[[43,10],[43,-11],[70,-14],[74,-30],[66,-42]]},
+  {key:'egg', label:'便利商店：茶葉蛋（一顆就好）', door:[-46,10.5], cp:[-46,9.2, Math.PI/2], wp:[[-60,13],[-46,10]]},
+  {key:'soy', label:'超市：醬油（不要薄鹽的）', door:[16,10.5], cp:[16,9.2, Math.PI/2], wp:[[-22,10],[-22,37],[4,37],[4,10],[16,10]]},
+  {key:'tea', label:'飲料店：QQㄋㄟㄋㄟ好喝到咩噗茶（微糖微冰）', door:[65,-42.6], cp:[66,-41, 0], wp:[[43,10],[43,-11],[70,-14],[74,-30],[66,-42]]},
   {key:'pot', label:'陳媽媽家：拿回鍋子', door:[-25,-43], cp:[-25,-41, 0], wp:[[74,-30],[70,-14],[43,-9.5],[-25,-9.5],[-25,-42]], hidden:true},
   {key:'home', label:'回家交差', door:[-60,57], cp:[-60,54,Math.PI], wp:[[-25,-9.5],[-69,-9.5],[-69,10],[-60,13],[-60,56]], hidden:true},
   {key:'mrt', label:'市政府站：搭捷運去公館', door:[30,11.2], cp:[...rw(5.5, 18.2), Math.atan2(-RD[0], -RD[1])], wp:[[-60,13],[-22,10],[-22,37],[4,37],[4,10],[30,10.5]], pm:true},
@@ -1454,6 +1448,7 @@ const MOM = {
   '幫自己代答被抓包':'你是覺得教授很好騙嗎？',
   '答錯被教授記住名字':'期中考你自己看著辦。',
   '上課睡著被教授點名':'晚上不睡覺，上課在睡覺。',
+  '飲料點錯':'我說微糖微冰！你是想害我血糖飆高嗎？',
   '捷運急煞跌倒':'搭捷運要握扶手，小學生都知道。',
   '在捷運上吃東西被罰':'1500 元你自己出。',
   '被鳥屎命中':'回來先去洗澡，不要碰任何東西。',
@@ -1482,7 +1477,6 @@ function die(cause, extra) {
   S.deadAt = performance.now();
   setTimeout(() => $('dhint').style.visibility = 'visible', 700);
   $('dialog').classList.add('hide'); dlg = null; clearInterval(typeT);
-  stopMic();
   clearInterval(orderTimer); clearInterval(chenTimer); clearInterval(storeTimer); clearInterval(chTimer); $('chbarw').classList.add('hide'); $('sleepui').classList.add('hide');
   $('phone').classList.add('hide'); $('sub').classList.add('hide'); S.ring = 0; S.frozen = 0;
   overlay('death'); renderStats();
@@ -1527,7 +1521,7 @@ $('overlay').addEventListener('click', e => {
 });
 
 // ---------- 電話 ----------
-const NAG_AM = ['醬油不要買錯，買錯你自己喝掉。','茶葉蛋要挑顏色深一點的，比較入味。','飲料不要給我全糖喔，我在控制血糖。','你是不是又在路上滑手機？','走路看路，不要給我出事。','經過陳媽媽家記得打招呼。','買完就回來，不要在外面亂晃。','發票記得拿，月底要對獎。','隔壁陳媽媽的兒子已經在醫院實習了。','你表哥說他年終拿六個月。','超商的袋子要錢，不要拿。','你到底到哪裡了？我在陽台看不到你。'];
+const NAG_AM = ['醬油不要買錯，買錯你自己喝掉。','茶葉蛋要挑顏色深一點的，比較入味。','飲料記得微糖微冰，不要給我點錯。','你是不是又在路上滑手機？','走路看路，不要給我出事。','經過陳媽媽家記得打招呼。','買完就回來，不要在外面亂晃。','發票記得拿，月底要對獎。','隔壁陳媽媽的兒子已經在醫院實習了。','你表哥說他年終拿六個月。','超商的袋子要錢，不要拿。','你到底到哪裡了？我在陽台看不到你。'];
 const NAG_PM = ['上課有沒有在聽？不要給我睡覺。','教授點名你有沒有到？','晚餐要不要回來吃？我煮了你愛吃的滷肉。','雨傘有沒有帶？氣象說傍晚會下雨。','你那個資工到底在學什麼，可以修冷氣嗎？','捷運上不要坐博愛座喔，會被拍。','下課直接回家，不要跟阿哲去網咖。','你的期中考什麼時候？','剛剛陳媽媽說志豪又拿書卷獎了。','你去台科大會經過台大嘛，要不要考轉學？','早上那個醬油很好用，你終於買對一次。','晚上陳媽媽要來家裡坐，你早點回來。'];
 function answer() {
   S.ring = 0; $('phone').classList.add('hide');
@@ -1752,13 +1746,11 @@ function pickBottle(b) {
 }
 
 // ---------- 點餐（T7） ----------
-let orderTimer = null, rec = null, micStream = null, volRAF = 0, orderLeft = 0, peak = 0;
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let orderTimer = null, orderLeft = 0;
 function startOrder() {
   S.mode = 'order'; unlock(); overlay('order');
-  $('oline').textContent = '請大聲說出你要的飲料';
-  $('heard').textContent = ''; speak('店員', '請大聲說出你要的飲料');
-  if (SR && navigator.mediaDevices?.getUserMedia) startMic(); else startCards('你的瀏覽器不支援語音辨識，改用字卡');
+  $('oline').textContent = '你好，請問要點什麼？'; speak('店員', '你好，請問要點什麼');
+  startCards();
 }
 function orderClock(sec, onEnd) {
   clearInterval(orderTimer); orderLeft = sec;
@@ -1768,73 +1760,45 @@ function orderClock(sec, onEnd) {
     if (orderLeft <= 0) { clearInterval(orderTimer); onEnd(); }
   }, 100);
 }
-async function startMic() {
-  $('omic').classList.remove('hide'); $('ocard').classList.add('hide'); $('tocard').classList.remove('hide');
-  try {
-    micStream = await navigator.mediaDevices.getUserMedia({audio:true});
-  } catch (e) { startCards('找不到麥克風或沒有權限，改用字卡'); return; }
-  if (S.mode !== 'order') { stopMic(); return; }
-  const ac = audio(), src = ac.createMediaStreamSource(micStream), an = ac.createAnalyser(); an.fftSize = 1024; src.connect(an);
-  const buf = new Float32Array(an.fftSize);
-  const loop = () => { an.getFloatTimeDomainData(buf); let s = 0; for (const v of buf) s += v*v; const r = Math.sqrt(s/buf.length);
-    peak = Math.max(peak*.97, r); $('vol').style.width = Math.min(100, r*500) + '%'; volRAF = requestAnimationFrame(loop); };
-  peak = 0; loop();
-  rec = new SR(); rec.lang = 'zh-TW'; rec.continuous = true; rec.interimResults = true;
-  let loudest = 0;
-  rec.onresult = ev => {
-    let txt = '';
-    for (let i=ev.resultIndex; i<ev.results.length; i++) txt += ev.results[i][0].transcript;
-    $('heard').textContent = '店員聽到：' + txt;
-    loudest = Math.max(loudest, peak);
-    const last = ev.results[ev.results.length-1];
-    if (!last.isFinal) return;
-    if (checkTea(txt)) {
-      if (loudest < .05) { $('oline').textContent = '店員：「大聲一點，聽不到。」'; sfx.bad(); loudest = 0; return; }
-      orderOK();
-    } else { $('oline').textContent = '店員：「蛤？我們沒有賣這個。」'; sfx.bad(); }
-  };
-  rec.onerror = ev => { if (S.mode === 'order' && $('ocard').classList.contains('hide')) startCards(ev.error === 'not-allowed' ? '麥克風沒有權限，改用字卡' : '語音辨識無法使用，改用字卡'); };
-  rec.onend = () => { if (S.mode === 'order' && rec && $('ocard').classList.contains('hide')) try { rec.start(); } catch(e) {} };
-  try { rec.start(); } catch (e) { startCards('語音辨識無法啟動，改用字卡'); return; }
-  orderClock(10, () => die('社會性死亡', '店員：「下一位。」'));
-}
-function checkTea(t) {
-  t = t.replace(/\s/g, '').toUpperCase();
-  return t.includes('好喝') && t.includes('茶') && /Q|Ｑ|扣|酷|摳|求|球|KEW|CUE|KIU/.test(t);
-}
-function stopMic() {
-  cancelAnimationFrame(volRAF);
-  if (rec) { const r = rec; rec = null; r.onend = null; try { r.abort(); } catch(e) {} }
-  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
-}
-function startCards(msg) {
-  stopMic();
-  $('omic').classList.add('hide'); $('ocard').classList.remove('hide'); $('tocard').classList.add('hide');
-  if (msg) $('oline').textContent = msg;
+function startCards() {
   const ans = ['QQ','ㄋㄟㄋㄟ','好喝到','咩噗茶'];
   const pool = [...ans, '奶奶', '沒撲'].sort(() => Math.random() - .5);
   let got = [];
-  $('pick').textContent = '　';
-  $('cards').innerHTML = '';
+  $('ohint').textContent = '依照正確順序點選字卡'; $('pick').textContent = '　'; $('cards').innerHTML = '';
   pool.forEach(w => {
     const b = document.createElement('button'); b.textContent = w;
     b.onclick = () => {
       if (S.mode !== 'order') return;
       if (w !== ans[got.length]) { sfx.bad(); clearInterval(orderTimer); die('社會性死亡', `你說：「${got.join('')}${w}」`); return; }
       sfx.ok(); got.push(w); b.classList.add('used'); $('pick').textContent = got.join('');
-      if (got.length === 4) orderOK();
+      if (got.length === 4) setTimeout(() => askOpt('甜度', '好的，甜度呢？', ['全糖','少糖','半糖','微糖','無糖'], '微糖', () =>
+        askOpt('冰塊', '冰塊呢？', ['正常冰','少冰','微冰','去冰','熱的'], '微冰', orderOK)), 400);
     };
     $('cards').appendChild(b);
   });
   orderClock(10, () => die('社會性死亡', '店員：「下一位。」'));
 }
-$('tocard').onclick = () => startCards('改用字卡模式');
+function askOpt(k, q, opts, ok, next) {
+  if (S.mode !== 'order') return;
+  $('oline').textContent = '店員：「' + q + '」'; speak('店員', q);
+  $('ohint').textContent = '媽媽說的是……'; $('cards').innerHTML = '';
+  opts.forEach(w => {
+    const b = document.createElement('button'); b.textContent = w;
+    b.onclick = () => {
+      if (S.mode !== 'order') return;
+      if (w !== ok) { sfx.bad(); clearInterval(orderTimer); die('飲料點錯', `你點了${w}，媽媽要的是${ok}`); return; }
+      sfx.ok(); $('pick').textContent += '．' + w; next();
+    };
+    $('cards').appendChild(b);
+  });
+  orderClock(8, () => die('社會性死亡', '店員：「後面還有人在排喔。」'));
+}
 function orderOK() {
-  clearInterval(orderTimer); stopMic(); overlay(null);
+  clearInterval(orderTimer); overlay(null);
   S.mode = 'play';
-  dialog([['店員','一杯 QQㄋㄟㄋㄟ好喝到咩噗茶，好的！']], () => {
+  dialog([['店員','一杯 QQㄋㄟㄋㄟ好喝到咩噗茶，微糖微冰，好的！']], () => {
     complete(); lock();
-    getCard('tea', '獲得', 'QQㄋㄟㄋㄟ好喝到咩噗茶', '店員：「謝謝，大聲的客人！」');
+    getCard('tea', '獲得', 'QQㄋㄟㄋㄟ好喝到咩噗茶', '微糖微冰，店員：「謝謝光臨～」');
     setTimeout(() => {
       $('phone').classList.remove('hide'); $('phone').classList.add('ring'); $('phint').textContent = '媽媽打來了'; sfx.ring();
       setTimeout(() => {
@@ -2039,7 +2003,7 @@ function introDone() {
   enterRoom('home'); const r = ROOMS.home;
   player.position.set(r.ox - .6, 0, r.oz - 1); player.rotation.y = Math.PI*.6; yaw = player.rotation.y + Math.PI;
   homeMom.lookAt(player.position.x, 0, player.position.z);
-  dialog([['媽媽','阿明！一大早就在打電動！'],['媽媽','去幫我買東西，買不齊不准回來。'],['媽媽','巷口便利商店的茶葉蛋、超市的醬油，還有 101 那邊的……那個……'],['媽媽','QQㄋㄟㄋㄟ好喝到咩噗茶。'],['阿明','……好啦。'],['','手機收到媽媽的購物清單']], () => { renderList(); });
+  dialog([['媽媽','阿明！一大早就在打電動！'],['媽媽','去幫我買東西，買不齊不准回來。'],['媽媽','巷口便利商店的茶葉蛋、超市的醬油，還有 101 那邊的……那個……'],['媽媽','QQㄋㄟㄋㄟ好喝到咩噗茶，微糖微冰喔，我在控制血糖。'],['阿明','……好啦。'],['','手機收到媽媽的購物清單']], () => { renderList(); });
 }
 
 // ---------- 主迴圈 ----------
@@ -2319,8 +2283,9 @@ function updateTraps(dt) {
     if (T.kw.st === 'done' && !onK) S.kDone = true;
   }
   // T9 媽媽來電
+  if (S.mode === 'play' && S.frozen > 0) { S.frozen -= dt; if (S.frozen <= 0) $('sub').classList.add('hide'); }
+  if (S.ring > 0 && ['mkt','chen','train','class'].includes(S.room)) { S.ring = 0; $('phone').classList.add('hide'); S.nextCall = rand(25, 40); }
   if (S.mode === 'play' && S.stage < 8 && !['mkt','chen','train','class'].includes(S.room)) {
-    if (S.frozen > 0) { S.frozen -= dt; if (S.frozen <= 0) $('sub').classList.add('hide'); }
     if (S.ring > 0) {
       S.ring -= dt;
       if ((S.ring * 2 | 0) !== ((S.ring + dt) * 2 | 0)) sfx.ring();
