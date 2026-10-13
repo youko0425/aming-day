@@ -1,0 +1,2478 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>阿明的一天</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#ff3ea5;--cyan:#22e6ff;--orange:#ffb03a;--bg:rgba(12,6,30,.82);--line:rgba(34,230,255,.55)}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#07031a;color:#f2ecff;font-family:"Noto Sans TC",system-ui,sans-serif}
+canvas{display:block}
+.hide{display:none!important}
+.panel{background:var(--bg);border:2px solid var(--line);border-radius:14px;box-shadow:0 0 18px rgba(34,230,255,.25),inset 0 0 12px rgba(255,62,165,.12)}
+button{font-family:inherit;cursor:pointer}
+.btn{background:linear-gradient(90deg,var(--pink),#a33bff);color:#fff;border:0;border-radius:10px;padding:12px 26px;font-size:18px;font-weight:700;box-shadow:0 0 14px rgba(255,62,165,.6)}
+.btn:hover{filter:brightness(1.15)}
+.btn2{background:transparent;color:var(--cyan);border:2px solid var(--cyan);border-radius:10px;padding:8px 16px;font-size:15px}
+#hud{position:fixed;inset:0;pointer-events:none}
+#list{position:fixed;left:16px;top:16px;padding:12px 16px;min-width:250px}
+#list h3{margin:0 0 6px;font-size:15px;color:var(--cyan);letter-spacing:2px}
+#list .it{font-size:15px;margin:4px 0;opacity:.95}
+#list .it.done{opacity:.45;text-decoration:line-through}
+#list .it.cur{color:var(--orange);font-weight:700}
+#stats{position:fixed;right:16px;top:16px;padding:10px 16px;text-align:right;font-size:15px;line-height:1.6;pointer-events:auto}
+#stats b{color:var(--orange);font-size:18px}
+#music{margin-top:4px;font-size:13px;padding:3px 10px}
+#anger{position:fixed;left:16px;bottom:58px;padding:8px 14px;font-size:14px}
+#anger span{display:inline-block;width:22px;height:14px;margin-left:5px;border-radius:3px;border:1px solid var(--pink);vertical-align:middle}
+#anger span.on{background:var(--pink);box-shadow:0 0 8px var(--pink)}
+#nav{position:fixed;left:50%;top:14px;transform:translateX(-50%);text-align:center;font-size:14px;color:var(--cyan);text-shadow:0 0 6px #000}
+#arrow{width:44px;height:44px;margin:0 auto;transition:transform .08s linear}
+#banner{position:fixed;left:50%;top:26%;transform:translate(-50%,-50%);font-size:52px;font-weight:900;letter-spacing:8px;color:#fff;text-shadow:0 4px 0 #1c4fa0,0 0 14px rgba(0,0,0,.45);opacity:0;transition:opacity .5s}
+#banner.show{opacity:1}
+#prompt{position:fixed;left:50%;bottom:150px;transform:translateX(-50%);padding:8px 18px;font-size:17px}
+#keys{position:fixed;left:0;right:0;bottom:12px;text-align:center;font-size:13px;opacity:.9}
+#keys kbd{background:#2a1450;border:1px solid var(--cyan);border-radius:5px;padding:1px 7px;margin:0 3px 0 10px;font-family:inherit;color:var(--cyan)}
+#dialog{position:fixed;left:50%;bottom:52px;transform:translateX(-50%);width:min(760px,92vw);padding:24px 26px 20px;font-size:20px;min-height:110px}
+#dname{position:absolute;top:-16px;left:22px;background:var(--orange);color:#24103d;font-weight:900;padding:3px 14px;border-radius:8px;font-size:15px}
+#dnext{position:absolute;right:18px;bottom:8px;color:var(--pink);font-size:14px;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.2}}
+#phone{position:fixed;right:22px;bottom:70px;width:190px;padding:14px;text-align:center}
+#phone .who{font-size:22px;font-weight:900;color:var(--pink)}
+#phone.ring{animation:shake .25s infinite}
+@keyframes shake{0%,100%{transform:rotate(0)}25%{transform:rotate(-3deg)}75%{transform:rotate(3deg)}}
+#sub{position:fixed;left:50%;bottom:110px;transform:translateX(-50%);font-size:20px;padding:8px 18px;color:#ffe9b0;text-shadow:0 2px 4px #000}
+.center{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%)}
+#title{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 40%,rgba(80,20,120,.55),rgba(5,2,18,.92));pointer-events:auto}
+#title .box{text-align:center;padding:36px 40px;max-width:640px}
+#title h1{font-size:56px;margin:0;font-weight:900;color:#fff;text-shadow:0 0 14px var(--pink),0 0 34px var(--pink)}
+#title .sub{color:var(--cyan);margin:10px 0 22px;font-size:17px;letter-spacing:2px}
+#title .how{font-size:14px;line-height:1.9;margin-top:22px;opacity:.9}
+#title .note{font-size:12px;opacity:.6;margin-top:12px}
+#overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:auto;background:rgba(5,2,18,.55)}
+.card{padding:28px 32px;width:min(620px,92vw);text-align:center}
+#death .cause{font-size:38px;font-weight:900;color:var(--pink);text-shadow:0 0 12px var(--pink);margin:6px 0 12px}
+#death .mom{font-size:20px;margin-bottom:14px}
+#death .cnt{font-size:15px;color:var(--cyan)}
+#death .hint{margin-top:16px;font-size:14px;opacity:.7}
+.big{font-size:22px;margin:6px 0 14px}
+.bar{height:16px;border:1px solid var(--cyan);border-radius:8px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--pink));width:0}
+.opts{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.opt{background:#1d0d3d;border:2px solid var(--line);color:#fff;border-radius:10px;padding:12px;font-size:17px;text-align:left}
+.opt:hover{border-color:var(--pink);background:#2c1157}
+.cards{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:14px 0}
+.cards button{font-size:22px;padding:12px 18px;border-radius:10px;border:2px solid var(--orange);background:#2a1450;color:#fff}
+.cards button.used{opacity:.3;pointer-events:none}
+#pick{min-height:34px;font-size:22px;color:var(--orange)}
+#chen .line{font-size:20px;margin:10px 0;min-height:60px}
+#chen .react{font-size:20px;color:var(--orange);min-height:30px;line-height:1.6;padding:10px 6px;background:rgba(0,0,0,.25);border-radius:10px;margin-top:6px}
+#pause{padding:26px 34px;width:min(420px,90vw);text-align:center}
+#pause h2{margin:0 0 16px;font-size:26px;color:var(--orange)}
+#pause .row{display:flex;justify-content:space-between;align-items:center;margin:12px 0;font-size:17px}
+#pause input[type=range]{width:160px;accent-color:var(--pink)}
+#pause .tg{min-width:72px}
+#end .grade{font-size:96px;font-weight:900;color:var(--orange);text-shadow:0 0 18px var(--orange);line-height:1}
+#end table{margin:14px auto;font-size:16px;border-collapse:collapse}
+#end td{padding:4px 14px;text-align:left}
+#end td:first-child{color:var(--cyan)}
+#fade{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .4s}
+#fade.on{opacity:1}
+#lockhint{position:fixed;left:50%;top:62%;transform:translateX(-50%);background:rgba(10,8,30,.7);color:#fff;padding:6px 14px;border-radius:8px;font-size:14px;pointer-events:none}
+#sleepui{position:fixed;left:50%;top:30%;transform:translateX(-50%);font-size:26px;font-weight:900;color:#fff;text-shadow:0 2px 6px #000;text-align:center;z-index:5}
+#getcard{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%) scale(.6);opacity:0;text-align:center;padding:22px 40px;transition:transform .35s cubic-bezier(.2,1.6,.4,1),opacity .3s;pointer-events:none}
+#getcard.show{transform:translate(-50%,-50%) scale(1);opacity:1}
+#getcard .ic{width:110px;height:110px;margin:0 auto}
+#getcard .gk{font-size:14px;color:var(--cyan);letter-spacing:3px}
+#getcard .gt{font-size:30px;font-weight:900;color:var(--orange);margin-top:4px}
+#getcard .gs{font-size:16px;margin-top:6px;opacity:.9}
+#line{position:fixed;right:16px;top:150px;width:270px;padding:10px 14px;background:#f4f4f4;color:#222;border-radius:14px;box-shadow:0 4px 14px rgba(0,0,0,.4);transform:translateX(320px);transition:transform .35s}
+#line.show{transform:none}
+#line .ln{font-size:12px;color:#06a54b;font-weight:700;margin-bottom:4px}
+#line .lt{background:#fff;border-radius:10px;padding:8px 10px;font-size:15px;border:1px solid #ddd}
+#list .it.new{animation:newit 1s 4}
+@keyframes newit{50%{background:rgba(255,176,58,.35)}}
+.shelf{display:flex;gap:12px;justify-content:center;align-items:flex-end;margin:16px 0;flex-wrap:wrap}
+.shelf button{background:#2a1f18;border:2px solid #6a5040;border-radius:10px;padding:8px 6px 4px}
+.shelf button:hover{border-color:var(--orange)}
+#sq{font-size:13px;color:var(--cyan)}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+</head>
+<body>
+<div id="hud" class="hide">
+  <div id="list" class="panel"><h3>媽媽的購物清單</h3><div id="items"></div></div>
+  <div id="stats" class="panel">時間 <b id="time">00:00</b><br>死亡 <b id="deaths">0</b> 次<br>發票 <b id="rc">0</b> 張</div>
+  <div id="anger" class="panel">媽媽怒氣<span></span><span></span><span></span></div>
+  <div id="nav"><svg id="arrow" viewBox="0 0 40 40"><path d="M20 3 L34 34 L20 26 L6 34 Z" fill="#22e6ff" stroke="#fff" stroke-width="1.5"/></svg><div id="navt"></div></div>
+  <div id="banner"></div>
+  <div id="getcard" class="panel"><div class="ic" id="gicon"></div><div class="gk" id="gkind"></div><div class="gt" id="gtitle"></div><div class="gs" id="gsub"></div></div>
+  <div id="line"><div class="ln" id="lwho">LINE．媽媽</div><div class="lt" id="ltext"></div></div>
+  <div id="prompt" class="panel hide"></div>
+  <div id="sub" class="hide"></div>
+  <div id="phone" class="panel hide"><div>來電中</div><div class="who">媽媽</div><div id="phint">按 F 接聽</div></div>
+  <div id="keys"><kbd>WASD</kbd>移動<kbd>Shift</kbd>奔跑<kbd>Space</kbd>跳躍<kbd>E</kbd>互動<kbd>F</kbd>接電話<kbd>滑鼠</kbd>轉視角<kbd>Esc</kbd>暫停／設定</div>
+</div>
+<div id="fade"></div>
+<div id="lockhint" class="hide">點一下畫面就能用滑鼠轉視角</div>
+<div id="sleepui" class="hide">保持清醒！狂按 Space<div class="bar" style="width:260px;margin:8px auto"><i id="sleepbar" style="width:0;background:var(--pink)"></i></div></div>
+<div id="dialog" class="panel hide"><div id="dname"></div><div id="dtext"></div><div id="dnext">按 Space 繼續</div></div>
+
+<div id="title">
+  <div class="box panel">
+    <h1>阿明的一天</h1>
+    <div class="sub">台北．信義區．早上十點</div>
+    <button class="btn" id="start">開始遊戲</button>
+    <div class="how">媽媽叫你出門跑腿，買不齊不准回來。<br>
+    WASD 移動｜Shift 奔跑｜Space 跳躍｜滑鼠控制視角<br>E 互動｜F 接媽媽電話｜Esc 暫停與音樂設定</div>
+    <div class="note">建議使用桌機 Chrome。飲料店會用到麥克風，沒有麥克風也可以玩。</div>
+    <div class="note" id="best"></div>
+  </div>
+</div>
+
+<div id="overlay" class="hide">
+  <div id="death" class="card panel hide">
+    <div>你死了</div>
+    <div class="cause" id="dcause"></div>
+    <div class="mom" id="dmom"></div>
+    <div class="cnt" id="dcnt"></div>
+    <div class="hint" id="dhint">按任意鍵重來</div>
+  </div>
+  <div id="store" class="card panel hide">
+    <div style="color:var(--cyan)">24H 便利商店．櫃台</div>
+    <div id="sq"></div>
+    <div class="big" id="sline"></div>
+    <div class="bar"><i id="stime" style="background:var(--orange)"></i></div>
+    <div class="opts" id="sopts"></div>
+    <div class="react" id="sreact" style="color:var(--orange);min-height:26px;margin-top:10px"></div>
+  </div>
+  <div id="shelf" class="card panel hide">
+    <div style="color:var(--cyan)">好鄰居超市．調味料區</div>
+    <div class="big" id="hline"></div>
+    <div class="shelf" id="bottles"></div>
+    <div id="hreact" style="color:var(--orange);min-height:26px"></div>
+  </div>
+  <div id="order" class="card panel hide">
+    <div style="color:var(--cyan)">咩噗茶飲．店員</div>
+    <div class="big" id="oline">請大聲說出你要的飲料</div>
+    <div id="omic">
+      <div>對著麥克風大聲喊：<b style="color:var(--orange)">QQㄋㄟㄋㄟ好喝到咩噗茶</b></div>
+      <div class="bar"><i id="vol"></i></div>
+      <div id="heard" style="min-height:26px;opacity:.8"></div>
+    </div>
+    <div id="ocard" class="hide">
+      <div>依照正確順序點選字卡</div>
+      <div id="pick"></div>
+      <div class="cards" id="cards"></div>
+    </div>
+    <div class="bar"><i id="otime" style="background:var(--orange)"></i></div>
+    <button class="btn2" id="tocard">改用字卡</button>
+  </div>
+  <div id="chen" class="card panel hide">
+    <div style="color:var(--cyan)">陳媽媽家．第 <span id="cround">1</span> 回合</div>
+    <b id="cval" class="hide">100</b><i id="cbar" class="hide"></i>
+    <div class="line" id="cline"></div>
+    <div class="react" id="creact"></div>
+    <i id="ctime" class="hide"></i>
+    <div class="opts" id="copts"></div>
+    <button class="btn" id="cnext" style="margin-top:14px;display:none">繼續</button>
+    <button id="cgive" class="hide"></button>
+  </div>
+  <div id="argue" class="card panel hide">
+    <div class="big">兩群人同時轉頭看你：「你是哪一邊的？」</div>
+    <div class="opts">
+      <button class="opt" data-a="0">「這邊！」</button>
+      <button class="opt" data-a="1">「那邊！」</button>
+      <button class="opt" data-a="2">「我只是來買飲料的……」</button>
+    </div>
+  </div>
+  <div id="end" class="card panel hide">
+    <div class="grade" id="egrade" style="font-size:44px">阿明的一天．完</div>
+    <div class="big" id="emom"></div>
+    <table><tr><td>總時間</td><td id="etime"></td></tr><tr><td>死亡次數</td><td id="edeath"></td></tr><tr><td>最常見的死因</td><td id="ecause"></td></tr><tr><td>發票對獎</td><td id="ercpt"></td></tr><tr><td>支線</td><td id="eside"></td></tr><tr><td>最佳紀錄</td><td id="ebest"></td></tr></table>
+    <button class="btn" id="again">再玩一次</button>
+  </div>
+  <div id="choice" class="card panel hide">
+    <div style="color:var(--cyan)" id="chname"></div>
+    <div class="big" id="chtext"></div>
+    <div class="bar hide" id="chbarw"><i id="chbar" style="background:var(--orange)"></i></div>
+    <div class="opts" id="chopts"></div>
+  </div>
+  <div id="pause" class="panel hide">
+    <h2>暫停</h2>
+    <div class="row"><span>背景音樂</span><button class="btn2 tg" id="music">開</button></div>
+    <div class="row"><span>音樂音量</span><input type="range" id="mvol" min="0" max="100" value="50"></div>
+    <div class="row"><span>音效音量</span><input type="range" id="svol" min="0" max="100" value="70"></div>
+    <div class="row"><span>對話聲音</span><button class="btn2 tg" id="voice">開</button></div>
+    <div class="row"><span>畫質（卡頓時調低）</span><button class="btn2 tg" id="qual">高</button></div>
+    <button class="btn" id="resume" style="margin-top:12px">繼續遊戲</button>
+    <div style="font-size:13px;opacity:.6;margin-top:10px">遊戲中按 Esc 打開這個選單，按 M 也可以直接開關音樂</div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
+
+const TEST = location.search.includes('test');
+const $ = id => document.getElementById(id);
+const rand = (a,b) => a + Math.random()*(b-a);
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+
+// ---------- 渲染 ----------
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.setSize(innerWidth, innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.05;
+document.body.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xa9cdea);
+scene.fog = new THREE.FogExp2(0xc8d8e4, 0.0042);
+const cam = new THREE.PerspectiveCamera(62, innerWidth/innerHeight, 0.1, 1200);
+
+
+addEventListener('resize', () => {
+  cam.aspect = innerWidth/innerHeight; cam.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+scene.add(new THREE.HemisphereLight(0xd6e6ff, 0x8a7a62, 1.25));
+const sun = new THREE.DirectionalLight(0xfff0d8, 2.4);
+sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, {left:-45, right:45, top:45, bottom:-45, near:1, far:260});
+sun.shadow.bias = -.0004; sun.shadow.normalBias = .03;
+scene.add(sun, sun.target);
+const SUN_OFF = new THREE.Vector3(70, 110, 45);
+// 天空與遠山
+{
+  const sky = new THREE.Mesh(new THREE.SphereGeometry(900, 24, 12), new THREE.MeshBasicMaterial({side:THREE.BackSide, fog:false,
+    map:(() => { const c = document.createElement('canvas'); c.width = 4; c.height = 256; const g = c.getContext('2d'); const gr = g.createLinearGradient(0,0,0,256);
+      gr.addColorStop(0, '#5f9fde'); gr.addColorStop(.45, '#a9cdea'); gr.addColorStop(.55, '#e8e2d2'); gr.addColorStop(1, '#d8d0c0'); g.fillStyle = gr; g.fillRect(0,0,4,256);
+      const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })()}));
+  sky.userData.dyn = true; scene.add(sky); window.__sky = sky;
+  const mtn = new THREE.Group(); scene.add(mtn); window.__mtn = mtn;
+  const mm = new THREE.MeshLambertMaterial({color:0x9ab4b8, flatShading:true, fog:false});
+  for (let i=0; i<26; i++) { const a = i/26*Math.PI*2, r = rand(650, 760), h = rand(90, 190);
+    const m = new THREE.Mesh(new THREE.ConeGeometry(rand(70, 130), h, 6), mm); m.position.set(Math.cos(a)*r, h/2 - 5, Math.sin(a)*r); m.rotation.y = rand(0, 3); mtn.add(m); }
+}
+
+// ---------- 材質工具 ----------
+const matCache = {};
+const mat = (c, o={}) => {
+  const k = c + JSON.stringify(o);
+  return matCache[k] ||= new THREE.MeshStandardMaterial({color:c, roughness:.75, ...o});
+};
+const glowCache = {};
+const glow = c => glowCache[c] ||= new THREE.MeshBasicMaterial({color:c});
+
+function canvasTex(w, h, draw) {
+  const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+  draw(cv.getContext('2d'), w, h);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  return t;
+}
+
+const WALL = [['#d9cdb4','tile'],['#e8e4dc','tile'],['#b4533a','brick'],['#b8b4ac','plain'],['#cfbfa0','tile'],['#b8c8c0','tile'],['#c8a890','tile'],['#a8a49c','tile']];
+const wallTex = WALL.map(([bg, kind]) => {
+  const map = canvasTex(128, 128, (g,w,h) => {
+    g.fillStyle = bg; g.fillRect(0,0,w,h);
+    if (kind === 'brick') { g.strokeStyle = 'rgba(80,30,20,.35)'; g.lineWidth = 1; for (let y=0; y<h; y+=6) { g.beginPath(); g.moveTo(0,y); g.lineTo(w,y); g.stroke(); for (let x=(y/6)%2*6; x<w; x+=12) { g.beginPath(); g.moveTo(x,y); g.lineTo(x,y+6); g.stroke(); } } }
+    else if (kind === 'tile') { g.strokeStyle = 'rgba(0,0,0,.07)'; g.lineWidth = 1; for (let y=0; y<h; y+=5) { g.beginPath(); g.moveTo(0,y); g.lineTo(w,y); g.stroke(); } }
+    for (let y=10; y<h; y+=32) for (let x=7; x<w; x+=32) {
+      g.fillStyle = '#f2f2ee'; g.fillRect(x-2, y-2, 22, 20);
+      const gr = g.createLinearGradient(x, y, x+18, y+16); gr.addColorStop(0, '#8fb0c8'); gr.addColorStop(.5, '#c8dcea'); gr.addColorStop(1, '#6f8ea8');
+      g.fillStyle = gr; g.fillRect(x, y, 18, 16);
+      if (Math.random() < .55) { g.strokeStyle = '#6a6e74'; g.lineWidth = 1.4; for (let k=x+3; k<x+18; k+=4) { g.beginPath(); g.moveTo(k,y-3); g.lineTo(k,y+17); g.stroke(); } g.strokeRect(x-2, y-3, 22, 21); }
+      if (Math.random() < .45) { g.fillStyle = '#e4e4e0'; g.fillRect(x+20, y+9, 8, 7); g.fillStyle = '#9a9a96'; g.fillRect(x+21, y+11, 6, 1); }
+    }
+  });
+  return {map};
+});
+
+function signTex(text, color, opt={}) {
+  const vert = opt.vert;
+  const n = [...text].length;
+  const fs = 64;
+  const w = vert ? 110 : Math.max(256, n*fs*1.0 + 60);
+  const h = vert ? n*fs*1.08 + 50 : 120;
+  return canvasTex(w, h, (g) => {
+    g.fillStyle = opt.bg || color; g.fillRect(0,0,w,h);
+    g.strokeStyle = 'rgba(255,255,255,.8)'; g.lineWidth = 5; g.strokeRect(6,6,w-12,h-12);
+    g.font = `900 ${fs}px "Noto Sans TC", sans-serif`; g.fillStyle = opt.fg || '#fff'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    if (vert) [...text].forEach((c,i) => g.fillText(c, w/2, 25 + fs*1.08*(i+.5)));
+    else g.fillText(text, w/2, h/2 + 4);
+  });
+}
+
+function sign(text, color, x, y, z, ry=0, opt={}) {
+  const t = signTex(text, color, opt);
+  const sc = opt.scale || 1;
+  const w = t.image.width/100*sc, h = t.image.height/100*sc;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({map:t, side:THREE.DoubleSide, color:0xd8d8d8}));
+  m.position.set(x, y, z); m.rotation.y = ry; scene.add(m);
+  return m;
+}
+
+// ---------- 碰撞與建築 ----------
+const solids = [];   // {x1,x2,z1,z2,h}
+const rsolids = [];
+const camBoxes = [];
+function solid(x1, x2, z1, z2, h=3) {
+  solids.push({x1, x2, z1, z2, h});
+  camBoxes.push(new THREE.Box3(new THREE.Vector3(x1, 0, z1), new THREE.Vector3(x2, h, z2)));
+}
+function building(x1, x2, z1, z2, h, o={}) {
+  const w = x2-x1, d = z2-z1;
+  const wt = wallTex[o.tex ?? ((Math.abs(x1*7+z1*3)|0) % WALL.length)];
+  const rx = Math.max(1,Math.round(Math.max(w,d)/5)), ry = Math.max(1,Math.round(h/4));
+  const t = wt.map.clone(); t.needsUpdate = true; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(rx, ry);
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshLambertMaterial({color:o.color||0xffffff, map:o.plain?null:t}));
+  if (o.plain) m.material.color.set(o.color||0x6a6258);
+  m.position.set(x1+w/2, h/2, z1+d/2); scene.add(m);
+  const roof = new THREE.Mesh(new THREE.BoxGeometry(w+.3, .4, d+.3), mat(0x9a948a)); roof.position.set(x1+w/2, h+.2, z1+d/2); scene.add(roof);
+  solid(x1, x2, z1, z2, h);
+  return m;
+}
+const FRONT = [0,1,2,3].map(k => canvasTex(128, 96, g => {
+  if (k === 0) { g.fillStyle = '#a8aab0'; g.fillRect(0,0,128,96); g.fillStyle = '#8a8c92'; for (let y=0; y<96; y+=5) g.fillRect(0,y,128,2); }
+  else if (k === 1) { g.fillStyle = '#3a3a40'; g.fillRect(0,0,128,96); g.fillStyle = '#c8dce8'; g.fillRect(8,10,112,70); for (let i=0; i<14; i++) { g.fillStyle = ['#d84a3a','#e8c040','#3a8ad8','#4ab86a','#f0f0f0'][i%5]; g.fillRect(14+(i%7)*15, 30+Math.floor(i/7)*24, 10, 16); } }
+  else if (k === 2) { g.fillStyle = '#2a2420'; g.fillRect(0,0,128,96); g.fillStyle = '#e8d8b8'; g.fillRect(10,40,40,30); g.fillStyle = '#c84a2a'; g.fillRect(70,30,46,60); g.fillStyle = '#f0f0f0'; g.fillRect(16,46,28,4); }
+  else { g.fillStyle = '#d8d4cc'; g.fillRect(0,0,128,96); g.fillStyle = '#6a8aa8'; g.fillRect(10,10,50,80); g.fillRect(68,10,50,80); g.strokeStyle = '#555'; g.lineWidth = 3; g.strokeRect(10,10,50,80); g.strokeRect(68,10,50,80); }
+}));
+const SHOPN = [['豆漿早餐','#d8641c'],['水電行','#1c5fb8'],['檳榔','#1f8a3a'],['美髮院','#b04a8a'],['自助餐','#c0392b'],['五金百貨','#d8a01c'],['中醫診所','#2a6a4a'],['彩券行','#c0392b'],['乾洗店','#1c7ab8'],['電器行','#333333'],['小吃店','#b8541c'],['文具行','#2a5aa0'],['機車行','#3a3a3a'],['滷味','#8a2a1a'],['手機行','#1c5fb8'],['寵物店','#d8641c']];
+let shopI = 0;
+function rowBlock(x1, x2, z1, z2, face) {
+  let x = x1;
+  while (x < x2 - .1) {
+    let w = rand(5, 9); if (x2 - (x + w) < 4) w = x2 - x;
+    const floors = 3 + ((Math.random()*5)|0), h = floors*3.2;
+    building(x, x + w, z1, z2, h, {tex:(Math.random()*WALL.length)|0});
+    const fz = face > 0 ? z2 + .03 : z1 - .03, ry = face > 0 ? 0 : Math.PI, cx = x + w/2;
+    const fr = new THREE.Mesh(new THREE.PlaneGeometry(w - .3, 3), new THREE.MeshLambertMaterial({map:FRONT[(Math.random()*4)|0]})); fr.position.set(cx, 1.5, fz); fr.rotation.y = ry; scene.add(fr);
+    const [n, c] = SHOPN[shopI++ % SHOPN.length];
+    const st = canvasTex(256, 64, g => { g.fillStyle = c; g.fillRect(0,0,256,64); g.fillStyle = '#fff'; g.font = '900 40px "Noto Sans TC", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(n, 128, 34); });
+    const sb = new THREE.Mesh(new THREE.BoxGeometry(w*.8, .9, .15), [mat(c), mat(c), mat(c), mat(c), new THREE.MeshLambertMaterial({map:st}), new THREE.MeshLambertMaterial({map:st})]);
+    sb.position.set(cx, 3.55, fz + face*.1); sb.rotation.y = ry; scene.add(sb);
+    for (let f=1; f<floors; f++) for (let k=0; k<2; k++) if (Math.random() < .4) {
+      const cage = new THREE.Mesh(new THREE.BoxGeometry(1.5, 1.5, .5), mat(0x8a8e92, {transparent:true, opacity:.85}));
+      cage.position.set(x + w*(k ? .7 : .3), f*3.2 + 1.6, fz + face*.25); scene.add(cage);
+    }
+    const ry2 = h + .4;
+    if (Math.random() < .55) { const tk = new THREE.Mesh(new THREE.CylinderGeometry(.55, .55, 1.3, 10), mat(Math.random() < .5 ? 0xdedede : 0x3a6ab8, {metalness:.4})); tk.position.set(x + w*rand(.25,.75), ry2 + 1.2, (z1+z2)/2); scene.add(tk);
+      const lg = new THREE.Mesh(new THREE.BoxGeometry(.9, .6, .9), mat(0x6a6a6a)); lg.position.set(tk.position.x, ry2 + .3, tk.position.z); scene.add(lg); }
+    if (Math.random() < .45) { const ad = new THREE.Mesh(new THREE.BoxGeometry(w*.6, 2.4, (z2-z1)*.4), mat(Math.random() < .5 ? 0x8aa8c8 : 0xc8c8c0)); ad.position.set(cx, ry2 + 1.2, face > 0 ? z1 + (z2-z1)*.3 : z2 - (z2-z1)*.3); scene.add(ad); }
+    x += w;
+  }
+}
+function shop(x1, x2, z1, z2, h, face, name, color, o={}) {
+  building(x1, x2, z1, z2, h, {plain:true, color:o.wall||0x8a8178});
+  const cx = (x1+x2)/2, fz = face > 0 ? z2+.05 : z1-.05, ry = face > 0 ? 0 : Math.PI;
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry((x2-x1)*.8, h*.5), new THREE.MeshLambertMaterial({color:o.glass||0xb8d4e4}));
+  glass.position.set(cx, h*.32, fz); glass.rotation.y = ry; scene.add(glass);
+  sign(name, color, cx, h*.78, fz + face*.06, ry, {scale:o.scale||1.1});
+  const strip = new THREE.Mesh(new THREE.BoxGeometry(x2-x1, .25, .25), mat(0xdddddd));
+  strip.position.set(cx, h*.62, fz + face*.1); scene.add(strip);
+  const aw = new THREE.Mesh(new THREE.BoxGeometry(x2-x1, .12, 1.4), mat(color)); aw.position.set(cx, h*.58, fz + face*.7); aw.rotation.x = face*.12; scene.add(aw);
+}
+
+// 地面
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(1200, 1200), mat(0x8a9a7a, {roughness:.95}));
+ground.rotation.x = -Math.PI/2; scene.add(ground);
+function flat(x1, x2, z1, z2, c, y=.02, o={}) {
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(x2-x1, z2-z1), mat(c, o));
+  m.rotation.x = -Math.PI/2; m.position.set((x1+x2)/2, y, (z1+z2)/2); scene.add(m); return m;
+}
+flat(-100, 112, -7, 7, 0x4a4c52, .02, {roughness:.9});
+flat(-100, 112, 7, 12, 0xb8aca0, .03);
+flat(-100, 112, -12, -7, 0xb8aca0, .03);
+flat(-63, -57, 12, 58, 0x6a6a6e, .03);
+flat(-24, 6, 12, 40, 0x5a585c, .03);
+flat(-28, -22, -44, -12, 0x6a6a6e, .03);
+flat(38, 112, -96, -12, 0xc8c0b0, .03);
+for (const z of [-.18, .18]) flat(-100, 112, z-.07, z+.07, 0xe0c040, .035);
+for (const z of [-6.5, 6.5]) flat(-100, 112, z-.06, z+.06, 0xf0f0ea, .035);
+for (const z of [-3.6, 3.6]) for (let x=-96; x<110; x+=8) flat(x, x+4, z-.06, z+.06, 0xf0f0ea, .035);
+for (const c of [{x1:38, x2:48}, {x1:-74, x2:-64}]) for (const [a, b] of [[c.x1-7, c.x1-2.5], [c.x2+2.5, c.x2+7]]) {
+  const z1 = a < c.x1 ? -6.4 : 2.4, z2 = z1 + 4;
+  for (const [x, zz] of [[a, null], [b, null]]) flat(x-.06, x+.06, z1, z2, 0xf0f0ea, .036);
+  flat(a, b, z1-.06, z1+.06, 0xf0f0ea, .036); flat(a, b, z2-.06, z2+.06, 0xf0f0ea, .036);
+}
+const CW = [{x1:38, x2:48}, {x1:-74, x2:-64}];
+CW.forEach(c => { for (let z=-6.5; z<6.5; z+=1.3) flat(c.x1, c.x2, z, z+.65, 0xe8e8f0, .04); });
+
+// 南側建築
+rowBlock(-100, -66, 12, 26, -1); building(-100, -66, 26, 58, 18);
+building(-100, -66, 58, 72, 16);
+building(-57, -36, 26, 58, 22);
+building(-54, -36, 58, 72, 14);
+building(-66, -54, 58, 72, 12.8, {tex:0});
+{
+  const dr = new THREE.Mesh(new THREE.BoxGeometry(1.8, 2.4, .12), mat(0x8a2a1a, {metalness:.4})); dr.position.set(-60, 1.2, 57.96); scene.add(dr);
+  for (let x=-60.75; x<-59.2; x+=.25) { const b = new THREE.Mesh(new THREE.BoxGeometry(.04, 2.3, .04), mat(0x5a1a10)); b.position.set(x, 1.2, 57.88); scene.add(b); }
+  const fr = new THREE.Mesh(new THREE.PlaneGeometry(11.6, 3), new THREE.MeshLambertMaterial({color:0xcfc6b4})); fr.position.set(-60, 1.5, 57.97); fr.rotation.y = Math.PI; scene.add(fr);
+  sign('阿明家', '#7a3b2a', -60, 2.8, 57.9, Math.PI, {scale:.5});
+  for (const x of [-62.2, -57.8]) { const pt = new THREE.Mesh(new THREE.CylinderGeometry(.3, .22, .45, 10), mat(0xa0583a)); pt.position.set(x, .23, 57.4); scene.add(pt);
+    const pl = new THREE.Mesh(new THREE.IcosahedronGeometry(.45, 0), mat(0x4f8a3a, {flatShading:true})); pl.position.set(x, .75, 57.4); scene.add(pl); }
+  const ac = new THREE.Mesh(new THREE.BoxGeometry(.9, .6, .4), mat(0xdedede)); ac.position.set(-63, 4.5, 57.75); scene.add(ac);
+}
+shop(-57, -36, 12, 26, 6, -1, '24H 便利商店', '#1f8a5c');
+rowBlock(-36, -24, 12, 40, -1);
+rowBlock(-20, 2, 12, 34, -1);
+building(-36, 30, 40, 60, 20);
+building(6, 30, 30, 40, 12);
+shop(6, 26, 12, 30, 8, -1, '好鄰居超市', '#d8641c');
+building(26, 34, 20, 40, 10);
+rowBlock(34, 112, 12, 40, -1);
+// 捷運出口
+solid(26, 34, 12, 20, 4);
+{ const g = new THREE.Mesh(new THREE.BoxGeometry(8, 3.6, 8), new THREE.MeshStandardMaterial({color:0x88ccff, transparent:true, opacity:.35, roughness:.1}));
+  g.position.set(30, 1.8, 16); scene.add(g);
+  sign('M 市政府站', '#1c5fb8', 30, 4.08, 11.94, Math.PI, {scale:.8}); }
+
+// 北側建築
+rowBlock(-100, -28, -30, -12, 1);
+rowBlock(-22, 38, -30, -12, 1);
+building(-44, -28, -44, -30, 14);
+building(-22, -6, -44, -30, 14);
+building(-100, -44, -60, -30, 22);
+building(-6, 38, -60, -30, 16);
+shop(-32, -18, -56, -44, 8, 1, '陳宅', '#7a3b2a', {wall:0xb0a490, glass:0xffe2b0, scale:.9});
+// 101 廣場
+shop(48, 60, -52, -44, 7, 1, '猩爸克 COFFEE', '#1d6b4a', {scale:.75});
+shop(60, 70, -52, -45, 6, 1, '咩噗茶飲', '#c0392b', {scale:.8});
+const teaClerk = (() => {
+  solid(61, 69, -44.4, -43.4, 1.1);
+  const ct = new THREE.Mesh(new THREE.BoxGeometry(8, 1.1, 1), mat(0xb03a2e)); ct.position.set(65, .55, -43.9); scene.add(ct);
+  const top = new THREE.Mesh(new THREE.BoxGeometry(8.2, .08, 1.2), mat(0xf0ece4)); top.position.set(65, 1.14, -43.9); scene.add(top);
+  sign('咩噗茶飲', '#c0392b', 65, .6, -43.38, 0, {scale:.45});
+  const menu = canvasTex(512, 256, g => {
+    g.fillStyle = '#2a1a14'; g.fillRect(0,0,512,256); g.fillStyle = '#f2e6d0'; g.font = '900 30px "Noto Sans TC", sans-serif';
+    g.fillText('MENU', 24, 40);
+    g.font = '700 24px "Noto Sans TC", sans-serif';
+    [['珍珠奶茶','55'],['四季春青茶','35'],['多多綠','50'],['QQㄋㄟㄋㄟ好喝到咩噗茶','85'],['芋頭鮮奶','70']].forEach(([n,pz],i) => { g.fillStyle = i===3 ? '#ffcc4a' : '#f2e6d0'; g.fillText(n, 24, 84 + i*36); g.fillText(pz, 440, 84 + i*36); });
+  });
+  const mb = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 1.7), new THREE.MeshBasicMaterial({map:menu})); mb.position.set(65, 2.3, -44.93); scene.add(mb);
+  const sealer = new THREE.Mesh(new THREE.BoxGeometry(.5, .6, .5), mat(0xd8d8d8)); sealer.position.set(62.5, 1.48, -43.9); scene.add(sealer);
+  for (let i=0; i<5; i++) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.09, .07, .3, 10), mat([0xe8d6b8,0x6a9a4a,0xd8a050,0xb89ad8,0xe8d6b8][i])); c.position.set(66.6 + i*.3, 1.33, -43.7); scene.add(c); }
+  const c = person({shirt:0xc0392b, hair:0x201510}); c.position.set(65, 0, -44.75); scene.add(c);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(.29, .29, .1, 14), mat(0xc0392b)); cap.position.y = 1.86; c.add(cap);
+  return c;
+})();
+building(70, 102, -84, -52, 20, {plain:true, color:0x6f8a88, edge:0x9fbfb8});
+solid(37.6, 38, -96, -30, 2); solid(38, 112, -96.4, -96, 2); solid(111.6, 112, -96, -12, 2);
+{ const f = new THREE.Mesh(new THREE.BoxGeometry(.3, 1.6, 66), mat(0x55607a)); f.position.set(37.8, .8, -63); scene.add(f); }
+
+// 護欄與圍籬
+const RAIL = [[-99,-74],[-64,38],[48,111]];
+const railM = mat(0x8890a8, {metalness:.6, roughness:.3});
+for (const [a,b] of RAIL) for (const z of [7, -7]) {
+  solid(a, b, z-.2, z+.2, 1.3);
+  const r = new THREE.Mesh(new THREE.BoxGeometry(b-a, .12, .12), railM); r.position.set((a+b)/2, 1.1, z); scene.add(r);
+  const r2 = r.clone(); r2.position.y = .55; scene.add(r2);
+  for (let x=a; x<=b; x+=2.5) { const p = new THREE.Mesh(new THREE.BoxGeometry(.12, 1.2, .12), railM); p.position.set(x, .6, z); scene.add(p); }
+}
+function fence(x1, x2, z1, z2, label) {
+  solid(x1, x2, z1, z2, 1.8);
+  const m = new THREE.Mesh(new THREE.BoxGeometry(x2-x1, 1.8, z2-z1), mat(0xe8b800));
+  m.position.set((x1+x2)/2, .9, (z1+z2)/2); scene.add(m);
+  if (label) sign(label, '#e8b800', (x1+x2)/2 - .2, 2.3, (z1+z2)/2, -Math.PI/2, {scale:.55, fg:'#222'});
+}
+fence(-20, -19.4, 7.2, 12, '騎樓施工中');
+fence(-99.5, -99, 7.2, 12); fence(111, 111.5, 7.2, 12); fence(-99.5, -99, -12, -7.2); fence(111, 111.5, -12, -7.2);
+
+// 霓虹裝飾招牌
+const deco = [['牙醫診所','#1c5fb8'],['當舖','#b8241c'],['麵店','#c0392b'],['補習班','#1f7a4a'],['藥局','#1c8a5a'],['鹹酥雞','#d8641c'],['KTV','#7a2a8a'],['眼鏡行','#1c5fb8'],['五金行','#b8241c'],['機車行','#333333'],['早餐店','#d8a01c'],['旅社','#8a2a2a']];
+let di = 0;
+for (let x=-90; x<105; x+=11) {
+  if (x>-66 && x<-50) continue;
+  const [t,c] = deco[di++ % deco.length];
+  if (!(x>-60 && x<-30) && !(x>2 && x<34) && !(x>-24 && x<-19)) sign(t, c, x, 7.5, 11.64, Math.PI/2, {vert:true, scale:.55});
+  const [t2,c2] = deco[(di+5) % deco.length];
+  if (!(x+4>-30 && x+4<-20) && x+4 < 36) sign(t2, c2, x+4, 8, -11.64, Math.PI/2, {vert:true, scale:.55});
+}
+
+// ---------- 101 ----------
+const tower = new THREE.Group(); tower.position.set(86, 20, -68); tower.userData.static = true; scene.add(tower);
+{
+  const tm = new THREE.MeshStandardMaterial({color:0x6f9a96, roughness:.25, metalness:.55});
+  const em = new THREE.LineBasicMaterial({color:0x3d5a58, transparent:true, opacity:.6});
+  let y = 0;
+  const add = (geo, h) => { const m = new THREE.Mesh(geo, tm); m.position.y = y + h/2; m.rotation.y = Math.PI/4; tower.add(m);
+    const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo), em); e.position.copy(m.position); e.rotation.y = Math.PI/4; tower.add(e); y += h; };
+  add(new THREE.CylinderGeometry(9, 11, 40, 4), 40);
+  for (let i=0; i<8; i++) add(new THREE.CylinderGeometry(10.5, 8, 15, 4), 15);
+  add(new THREE.CylinderGeometry(5, 7, 12, 4), 12);
+  add(new THREE.CylinderGeometry(3, 4, 10, 4), 10);
+  const sp = new THREE.Mesh(new THREE.CylinderGeometry(.3, 1, 40, 6), mat(0xcfd8d8)); sp.position.y = y + 20; tower.add(sp);
+  const top = new THREE.Mesh(new THREE.SphereGeometry(.8, 8, 6), glow(0xff5040)); top.position.y = y + 40; tower.add(top);
+}
+// 路燈與行道樹
+for (let x=-90; x<110; x+=18) for (const z of [7.6, -7.6]) {
+  const p = new THREE.Mesh(new THREE.CylinderGeometry(.09, .12, 7, 6), mat(0x8a8e94)); p.position.set(x, 3.5, z); scene.add(p);
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(.1, .1, 1.8), mat(0x8a8e94)); arm.position.set(x, 7, z + (z > 0 ? -.9 : .9)); scene.add(arm);
+  const h = new THREE.Mesh(new THREE.BoxGeometry(.3, .12, .6), mat(0xdedede)); h.position.set(x, 6.92, z + (z > 0 ? -1.7 : 1.7)); scene.add(h);
+}
+const LEAF = [0x4f8a3a, 0x5f9a44, 0x3f7a34].map(c => new THREE.MeshLambertMaterial({color:c, flatShading:true}));
+function tree(x, z, sc=1) {
+  const t = new THREE.Mesh(new THREE.CylinderGeometry(.14*sc, .2*sc, 3*sc, 6), mat(0x6a4a2a)); t.position.set(x, 1.5*sc, z); scene.add(t);
+  for (let i=0; i<3; i++) { const l = new THREE.Mesh(new THREE.IcosahedronGeometry(rand(1.3, 1.8)*sc, 0), LEAF[(Math.random()*3)|0]);
+    l.position.set(x + rand(-.7,.7)*sc, (3.4 + rand(0, 1.2))*sc, z + rand(-.6,.6)*sc); l.rotation.set(rand(0,3), rand(0,3), 0); scene.add(l); }
+  solid(x-.25, x+.25, z-.25, z+.25, 3);
+}
+const NOTREE = [[-75,-63],[-58,-34],[-34,-28],[-21,-18],[5,30],[36,50]];
+for (let x=-94; x<108; x+=9) {
+  if (!NOTREE.some(([a,b]) => x > a && x < b)) tree(x, 8);
+  if (!NOTREE.some(([a,b]) => x > a && x < b) && !(x > -30 && x < -20)) tree(x+4, -8.2);
+}
+for (const [x,z] of [[42,-40],[42,-60],[42,-80],[60,-62],[60,-80],[105,-30],[105,-50],[80,-20],[100,-20]]) tree(x, z, 1.3);
+// 路名牌
+function street(t, en, x, y, z, ry) {
+  const tx = canvasTex(320, 110, g => { g.fillStyle = '#1c4fa0'; g.fillRect(0,0,320,110); g.strokeStyle = '#fff'; g.lineWidth = 4; g.strokeRect(6,6,308,98);
+    g.fillStyle = '#fff'; g.textAlign = 'center'; g.font = '900 44px "Noto Sans TC", sans-serif'; g.fillText(t, 160, 58); g.font = '700 18px sans-serif'; g.fillText(en, 160, 90); });
+  for (const k of [0, 1]) { const m = new THREE.Mesh(new THREE.PlaneGeometry(2.4, .82), new THREE.MeshBasicMaterial({map:tx})); m.position.set(x + Math.sin(ry)*(k ? -.02 : .02), y, z + Math.cos(ry)*(k ? -.02 : .02)); m.rotation.y = ry + k*Math.PI; scene.add(m); }
+  const p = new THREE.Mesh(new THREE.CylinderGeometry(.07, .07, y + .45, 6), mat(0x8a8e94)); p.position.set(x, (y + .45)/2, z); scene.add(p);
+}
+street('信義路五段', 'Xinyi Rd., Sec. 5', 36, 3.2, 10.4, Math.PI/2);
+street('松智路', 'Songzhi Rd.', 50, 3.2, -10.4, Math.PI/2);
+street('信義路五段', 'Xinyi Rd., Sec. 5', -62.6, 3.2, 10.4, Math.PI/2);
+
+function bakeGroup(g) {
+  g.updateMatrixWorld(true);
+  const inv = g.matrixWorld.clone().invert(), by = new Map(), old = [];
+  g.traverse(o => { if (!o.isMesh || o === g) return;
+    const geo = o.geometry.clone().applyMatrix4(inv.clone().multiply(o.matrixWorld));
+    for (const k of Object.keys(geo.attributes)) if (!['position','normal','uv'].includes(k)) geo.deleteAttribute(k);
+    if (!by.has(o.material)) by.set(o.material, []); by.get(o.material).push(geo); old.push(o); });
+  for (const o of old) o.parent.remove(o);
+  [...g.children].forEach(c => { if (c.isGroup) g.remove(c); });
+  for (const [m, geos] of by) { const mesh = new THREE.Mesh(mergeGeometries(geos, false), m); mesh.castShadow = true; g.add(mesh); }
+  return g;
+}
+// ---------- 人物 ----------
+function person(o) {
+  const g = new THREE.Group();
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(.3, .5, 4, 10), mat(o.shirt)); body.position.y = 1.05; g.add(body);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(.27, 16, 12), mat(o.skin||0xf1c9a5)); head.position.y = 1.64; g.add(head);
+  const hair = new THREE.Mesh(new THREE.SphereGeometry(.285, 16, 10, 0, Math.PI*2, 0, Math.PI*.55), mat(o.hair||0x1a1420)); hair.position.y = 1.66; hair.rotation.x = -.25; g.add(hair);
+  for (const s of [-1,1]) { const e = new THREE.Mesh(new THREE.SphereGeometry(.035, 6, 6), glow(o.eye||0x111111)); e.position.set(s*.09, 1.66, .25); g.add(e); }
+  const limb = (x, y, len, c) => { const p = new THREE.Group(); p.position.set(x, y, 0);
+    const m = new THREE.Mesh(new THREE.CapsuleGeometry(.09, len, 3, 6), mat(c)); m.position.y = -len/2 - .05; p.add(m); g.add(p); return p; };
+  const legL = limb(-.13, .72, .5, o.pants||0x22223a), legR = limb(.13, .72, .5, o.pants||0x22223a);
+  const armL = limb(-.4, 1.3, .45, o.shirt), armR = limb(.4, 1.3, .45, o.shirt);
+  g.userData = {legL, legR, armL, armR, ph:rand(0,6), head};
+  g.traverse(o => { if (o.isMesh) o.castShadow = true; });
+  return g;
+}
+function animP(p, spd, dt) {
+  const u = p.userData; u.ph += dt*(3 + spd*1.4);
+  const s = Math.sin(u.ph) * Math.min(spd/4, 1) * .75;
+  u.legL.rotation.x = s; u.legR.rotation.x = -s; u.armL.rotation.x = -s; u.armR.rotation.x = s;
+}
+function bubble(text, color='#ffffff') {
+  const t = canvasTex(512, 128, (g,w,h) => {
+    g.fillStyle = 'rgba(255,255,255,.92)'; g.strokeStyle = color; g.lineWidth = 8;
+    g.beginPath(); g.roundRect(6,6,w-12,h-12,30); g.fill(); g.stroke();
+    g.font = '900 54px "Noto Sans TC", sans-serif'; g.fillStyle = '#222'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, w/2, h/2+3);
+  });
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({map:t, depthTest:false}));
+  s.scale.set(3.2, .8, 1); s.renderOrder = 10; return s;
+}
+
+const player = person({shirt:0x2f7fd0, pants:0x2b2b44, hair:0x111018});
+{ const pack = new THREE.Mesh(new THREE.BoxGeometry(.42, .5, .2), mat(0x333333)); pack.position.set(0, 1.1, -.3); player.add(pack); }
+scene.add(player);
+const shadow = new THREE.Mesh(new THREE.CircleGeometry(.45, 16), new THREE.MeshBasicMaterial({color:0, transparent:true, opacity:.25}));
+shadow.rotation.x = -Math.PI/2; shadow.userData.dyn = true; scene.add(shadow);
+
+// 路人
+const walkers = [];
+for (const [x1,x2,z] of [[-90,-25,9.5],[8,100,10.5],[-95,30,-9.8],[50,105,-10.5],[60,100,-60]]) {
+  for (let k=0; k<2; k++) {
+    const p = person({shirt:[0xd06a3a,0x5a6c8a,0x6a9a6a,0xe0e0e0,0xb04a6a][(walkers.length)%5], hair:0x2a1a10});
+    p.position.set(rand(x1,x2), 0, z + rand(-.8,.8)); p.userData.r = [x1, x2]; p.userData.v = rand(1.2, 2) * (Math.random()<.5?1:-1);
+    scene.add(p); walkers.push(p);
+  }
+}
+
+// ---------- 交通 ----------
+function makeCar(c, drunk) {
+  const g = new THREE.Group();
+  const b = new THREE.Mesh(new THREE.BoxGeometry(4.2, .9, 1.9), mat(c, {metalness:.5, roughness:.4})); b.position.y = .75; g.add(b);
+  const t = new THREE.Mesh(new THREE.BoxGeometry(2.2, .7, 1.7), mat(0x101320, {metalness:.8, roughness:.2})); t.position.set(-.2, 1.5, 0); g.add(t);
+  for (const z of [-.6, .6]) { const h = new THREE.Mesh(new THREE.BoxGeometry(.1, .2, .4), glow(0xfff6d0)); h.position.set(2.12, .8, z); g.add(h);
+    const r = new THREE.Mesh(new THREE.BoxGeometry(.1, .2, .4), glow(0xff2040)); r.position.set(-2.12, .8, z); g.add(r); }
+  for (const x of [-1.3, 1.3]) for (const z of [-.95, .95]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(.38, .38, .25, 12), mat(0x151515)); w.rotation.x = Math.PI/2; w.position.set(x, .38, z); g.add(w); }
+  if (c === 0xf2c230) { const tx = new THREE.Mesh(new THREE.BoxGeometry(.7, .25, .4), glow(0xffffff)); tx.position.set(-.2, 2, 0); g.add(tx); }
+  bakeGroup(g); scene.add(g); return g;
+}
+const cars = [];
+for (let i=0; i<7; i++) {
+  const dir = i%2 ? 1 : -1;
+  const c = makeCar([0xf2c230,0x2050a0,0xe0e0e0,0x303030,0xf2c230,0x9a9aa0,0xf2c230][i], false);
+  c.position.set(rand(-95, 105), 0, dir > 0 ? -3.5 : 3.5); c.rotation.y = dir > 0 ? 0 : Math.PI;
+  c.userData = {dir, v:rand(9, 13), cur:0, hw:2.4}; cars.push(c);
+}
+function rider(c) {
+  const g = new THREE.Group(), sc = scooter(c); sc.rotation.y = Math.PI/2; g.add(sc);
+  const p = person({shirt:[0xe8e0d0,0x3a5a8a,0xc84a3a,0x4a8a5a,0xd8a030][(Math.random()*5)|0], hair:0x221a12});
+  p.rotation.y = Math.PI/2; p.position.set(-.25, .32, 0);
+  p.userData.legL.rotation.x = p.userData.legR.rotation.x = -1.35; p.userData.armL.rotation.x = p.userData.armR.rotation.x = -1.2;
+  const hm = new THREE.Mesh(new THREE.SphereGeometry(.31, 12, 8, 0, Math.PI*2, 0, Math.PI*.6), mat([0xe8e8e8,0xd84a3a,0x2a2a2a,0xe8c040][(Math.random()*4)|0])); hm.position.y = 1.68; p.add(hm);
+  if (Math.random() < .3) { const bx = new THREE.Mesh(new THREE.BoxGeometry(.5, .5, .5), mat(Math.random() < .5 ? 0x2fa860 : 0xe0508a)); bx.position.set(-.85, 1.15, 0); g.add(bx); }
+  g.add(p); bakeGroup(g); scene.add(g); return g;
+}
+for (let i=0; i<10; i++) {
+  const dir = i%2 ? 1 : -1, c = rider([0xe8e8e8, 0x2a2a2a, 0xb02020, 0x2a5aa0, 0xd8d0c0, 0x5a7a5a][i % 6]);
+  c.position.set(rand(-95, 105), 0, dir > 0 ? -5.4 : 5.4); c.rotation.y = dir > 0 ? 0 : Math.PI;
+  c.userData = {dir, v:rand(8, 11), cur:0, hw:1.1}; cars.push(c);
+}
+const SIG = {pr:new THREE.MeshBasicMaterial({color:0x331111}), pg:new THREE.MeshBasicMaterial({color:0x22ff66}), cr:new THREE.MeshBasicMaterial({color:0xff2a2a}), cg:new THREE.MeshBasicMaterial({color:0x113322})};
+const lights = CW.map(c => {
+  const pole = (x, z, arm) => {
+    const p = new THREE.Mesh(new THREE.CylinderGeometry(.12, .14, 6, 8), mat(0x8a8e94)); p.position.set(x, 3, z); scene.add(p);
+    const a = new THREE.Mesh(new THREE.BoxGeometry(.14, .14, Math.abs(arm)), mat(0x8a8e94)); a.position.set(x, 5.8, z + arm/2); scene.add(a);
+    const hd = new THREE.Mesh(new THREE.BoxGeometry(.4, .5, 1.5), mat(0x222222)); hd.position.set(x, 5.5, z + arm*.75); scene.add(hd);
+    const face = x < (c.x1+c.x2)/2 ? 1 : -1;
+    const r = new THREE.Mesh(new THREE.CircleGeometry(.17, 12), SIG.cr); r.position.set(x + face*.21, 5.5, z + arm*.75 - .45); r.rotation.y = face*Math.PI/2; scene.add(r);
+    const g = new THREE.Mesh(new THREE.CircleGeometry(.17, 12), SIG.cg); g.position.set(x + face*.21, 5.5, z + arm*.75 + .45); g.rotation.y = face*Math.PI/2; scene.add(g);
+    const sa = Math.sign(arm);
+    const ph = new THREE.Mesh(new THREE.BoxGeometry(.35, .7, .35), mat(0x222222)); ph.position.set(x, 3, z + sa*.25); scene.add(ph);
+    const pr = new THREE.Mesh(new THREE.PlaneGeometry(.22, .22), SIG.pr); pr.position.set(x, 3.15, z + sa*.43); pr.rotation.y = sa > 0 ? 0 : Math.PI; scene.add(pr);
+    const pg = new THREE.Mesh(new THREE.PlaneGeometry(.22, .22), SIG.pg); pg.position.set(x, 2.85, z + sa*.43); pg.rotation.y = sa > 0 ? 0 : Math.PI; scene.add(pg);
+  };
+  pole(c.x1 - .6, 7.6, -5); pole(c.x2 + .6, -7.6, 5);
+  return [];
+});
+let lightT = 0;
+const GREEN = 14, CYCLE = 24;
+const pedGreen = () => (lightT % CYCLE) < GREEN;
+
+// ---------- 陷阱物件 ----------
+// T1 機車骨牌
+function scooter(c) {
+  const s = new THREE.Group();
+  const add = (geo, m, x, y, z, rx=0) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.rotation.x = rx; s.add(o); return o; };
+  const body = mat(c, {roughness:.4, metalness:.3}), dark = mat(0x1a1a1a), grey = mat(0x777777, {metalness:.6});
+  add(new THREE.BoxGeometry(.34, .07, .62), dark, 0, .3, .08);
+  add(new THREE.BoxGeometry(.42, .72, .12), body, 0, .66, .46, -.28);
+  add(new THREE.BoxGeometry(.3, .2, .32), body, 0, .36, .62);
+  add(new THREE.BoxGeometry(.44, .36, .78), body, 0, .52, -.42);
+  add(new THREE.BoxGeometry(.36, .1, .72), dark, 0, .76, -.38);
+  add(new THREE.CylinderGeometry(.03, .03, .55, 6), grey, 0, .9, .56, -.28);
+  add(new THREE.BoxGeometry(.72, .05, .05), grey, 0, 1.13, .64);
+  add(new THREE.BoxGeometry(.24, .14, .1), body, 0, 1.08, .7);
+  add(new THREE.BoxGeometry(.14, .08, .03), glow(0xfff2c0), 0, 1.08, .76);
+  add(new THREE.BoxGeometry(.18, .06, .03), glow(0xd02020), 0, .62, -.82);
+  for (const [z, r] of [[.66, .2], [-.6, .21]]) { const w = add(new THREE.CylinderGeometry(r, r, .11, 14), dark, 0, r, z); w.rotation.z = Math.PI/2; }
+  if (Math.random() < .4) add(new THREE.BoxGeometry(.4, .3, .38), mat(0x2a2a2a), 0, .98, -.62);
+  return bakeGroup(s);
+}
+const SC_COL = [0xe8e8e8, 0x2a2a2a, 0xb02020, 0x2a5aa0, 0xd8d0c0, 0x5a7a5a];
+const scooters = [];
+for (let z=46; z>=16; z-=2) {
+  const s = scooter(SC_COL[scooters.length % SC_COL.length]);
+  s.position.set(-57.8, 0, z); s.userData.z = z; scene.add(s); scooters.push(s);
+}
+// 北側人行道停滿的機車
+for (const [a, b] of [[-95,-80],[0,12]]) {
+  solid(a, b, -12, -10.6, 1.2);
+  for (let x=a+.4; x<b; x+=1.1) { const s = scooter(SC_COL[(Math.abs(x)*7|0) % SC_COL.length]); s.position.set(x, 0, -11.25); s.rotation.y = Math.PI + rand(-.08,.08); s.userData.static = true; scene.add(s); }
+}
+// T2 騎樓破損地磚
+const STEP = {x1:-33, x2:-29, z1:7.3, z2:12, h:.1};
+{
+  const tm = [0x9a958c, 0xaba59a, 0x8a857c].map(c => mat(c));
+  for (let x=STEP.x1; x<STEP.x2-.01; x+=.5) for (let z=STEP.z1; z<STEP.z2-.01; z+=.5) {
+    const r = Math.random();
+    if (r < .1) { const h = new THREE.Mesh(new THREE.PlaneGeometry(.46, .46), mat(0x3a3530)); h.rotation.x = -Math.PI/2; h.position.set(x+.25, .036, z+.25); scene.add(h); continue; }
+    const t = new THREE.Mesh(new THREE.BoxGeometry(.46, .08, .46), tm[(Math.random()*3)|0]);
+    const bad = r < .5;
+    t.position.set(x+.25 + (bad ? rand(-.04,.04) : 0), .04 + (bad ? rand(.03,.13) : 0), z+.25 + (bad ? rand(-.04,.04) : 0));
+    if (bad) t.rotation.set(rand(-.28,.28), rand(-.25,.25), rand(-.28,.28));
+    scene.add(t);
+  }
+  const card = canvasTex(256, 200, g => {
+    g.fillStyle = '#b8935a'; g.fillRect(0,0,256,200);
+    g.fillStyle = 'rgba(0,0,0,.08)'; for (let i=0; i<256; i+=6) g.fillRect(i,0,2,200);
+    g.fillStyle = '#e6e0d0'; g.fillRect(40,-6,30,22); g.fillRect(186,-6,30,22);
+    g.font = '900 46px "Noto Sans TC", sans-serif'; g.fillStyle = '#111'; g.textAlign = 'center';
+    g.save(); g.translate(128, 80); g.rotate(-.04); g.fillText('地磚破損', 0, 0); g.restore();
+    g.font = '700 30px "Noto Sans TC", sans-serif'; g.fillStyle = '#b01010'; g.fillText('小心跌倒！', 128, 140);
+  });
+  const sg = new THREE.Mesh(new THREE.PlaneGeometry(.72, .56), new THREE.MeshLambertMaterial({map:card}));
+  sg.position.set(-33.83, 1.5, 11.6); sg.rotation.y = -Math.PI/2; scene.add(sg);
+}
+// 騎樓柱子
+for (let x=-54; x<-20; x+=6) { if (x > -35 && x < -27) continue; solid(x-.35, x+.35, 11.2, 12, 4); const c = new THREE.Mesh(new THREE.BoxGeometry(.7, 4, .8), mat(0xb8b0a0)); c.position.set(x, 2, 11.6); scene.add(c); }
+{ solid(-33.8, -33.1, 11.2, 12, 4); const c = new THREE.Mesh(new THREE.BoxGeometry(.7, 4, .8), mat(0xb8b0a0)); c.position.set(-33.45, 2, 11.6); scene.add(c); }
+// T3 喪屍煙彈客
+const zombie = person({shirt:0x3a4a3a, skin:0x9fbf8a, hair:0x223322, eye:0xff2020, pants:0x1a1a1a});
+scene.add(zombie);
+const zbub = bubble('……', '#5a8a5a'); zbub.position.y = 2.4; zombie.add(zbub);
+// T5 路邊爭論
+const ARG = {x:58, z:-26, r:6.5};
+const argGroup = new THREE.Group(); scene.add(argGroup);
+{
+  const flagTex = ['#1f9a4a', '#1d47b8'].map(c => canvasTex(128, 96, (g) => { g.fillStyle = c; g.fillRect(0,0,128,96); g.fillStyle = 'rgba(255,255,255,.85)'; g.fillRect(0,40,128,16); }));
+  const lines = [['你們根本不懂！','我們才是為大家好！','看清楚好不好！'],['是你們不懂！','我們才是為大家好！','到底誰沒看清楚！']];
+  for (let side=0; side<2; side++) for (let i=0; i<5; i++) {
+    const p = person({shirt:side ? 0x1d47b8 : 0x1f9a4a, hair:0x201510});
+    const a = (side ? 0 : Math.PI) + (i-2)*.32;
+    p.position.set(ARG.x + Math.cos(a)*3.2, 0, ARG.z + Math.sin(a)*2.2);
+    p.lookAt(ARG.x, 0, ARG.z);
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, 1.6), mat(0xaaaaaa)); pole.position.set(.4, 1.9, 0); p.add(pole);
+    const fl = new THREE.Mesh(new THREE.PlaneGeometry(.8, .6), new THREE.MeshBasicMaterial({map:flagTex[side], side:THREE.DoubleSide})); fl.position.set(.82, 2.4, 0); p.add(fl);
+    p.userData.armR.rotation.x = -2.6;
+    if (i === 2) { p.userData.col = side ? '#1d47b8' : '#1f9a4a'; const b = bubble(lines[side][0], side ? '#1d47b8' : '#1f9a4a'); b.position.y = 2.9; p.add(b); p.userData.bub = b; p.userData.lines = lines[side]; }
+    argGroup.add(p);
+  }
+}
+// T6 半杯拿鐵
+const SB = {x:54, z:-40};
+sign('去冰補滿 +$15', '#1d6b4a', 54, 3.2, -42.3, 0, {scale:.6});
+{
+  const tx = canvasTex(256, 340, g => {
+    g.fillStyle = '#4a3020'; g.fillRect(0,0,256,340); g.fillStyle = '#1f2a24'; g.fillRect(14,14,228,312);
+    g.textAlign = 'center'; g.fillStyle = '#f2efe6';
+    g.font = '700 30px "Noto Sans TC", sans-serif'; g.fillText('10/12 起 新制', 128, 60);
+    g.font = '900 46px "Noto Sans TC", sans-serif'; g.fillText('去冰．少冰', 128, 130);
+    g.fillText('補滿', 128, 185);
+    g.fillStyle = '#ffd24a'; g.font = '900 70px "Noto Sans TC", sans-serif'; g.fillText('+$15', 128, 265);
+    g.fillStyle = '#c8c4b8'; g.font = '400 22px "Noto Sans TC", sans-serif'; g.fillText('不補滿＝半杯', 128, 305);
+  });
+  const board = new THREE.Group();
+  for (const r of [-.22, .22]) { const pnl = new THREE.Mesh(new THREE.PlaneGeometry(.9, 1.2), new THREE.MeshStandardMaterial({map:tx, side:THREE.DoubleSide, roughness:.9}));
+    pnl.position.set(0, .62, r > 0 ? -.13 : .13); pnl.rotation.x = r; board.add(pnl); }
+  board.position.set(50.2, 0, -41.2); board.rotation.y = .5; scene.add(board);
+  solid(49.6, 50.8, -41.6, -40.8, 1.3);
+}
+const customer = person({shirt:0x2f6a4a, hair:0x5a3010}); scene.add(customer);
+const cbub = bubble('我的咖啡呢！', '#1d6b4a'); cbub.position.y = 2.5; customer.add(cbub);
+const cup = new THREE.Group();
+{ const c = new THREE.Mesh(new THREE.CylinderGeometry(.18, .13, .45, 12), new THREE.MeshStandardMaterial({color:0xffffff, transparent:true, opacity:.6}));
+  const l = new THREE.Mesh(new THREE.CylinderGeometry(.16, .13, .2, 12), mat(0x8a5a30)); l.position.y = -.1;
+  const lid = new THREE.Mesh(new THREE.CylinderGeometry(.2, .2, .05, 12), mat(0x2fff9a)); lid.position.y = .24;
+  cup.add(c, l, lid); cup.scale.setScalar(2.2); scene.add(cup); }
+// 醉車
+const drunkCar = makeCar(0x8a1a1a, true); drunkCar.visible = false;
+const dbub = bubble('呃～我很清醒啦', '#c0392b'); dbub.position.y = 3; drunkCar.add(dbub);
+// 媽媽本人
+const momP = person({shirt:0xd0406a, hair:0x3a2020, pants:0x5a3a5a}); momP.visible = false; scene.add(momP);
+const momBub = bubble('你給我回來！', '#c0392b'); momBub.position.y = 2.5; momP.add(momBub);
+
+// 發票
+const RCPT = [[-60,32],[-60,22],[-40,9.6],[-31,9.6],[-16,36.5],[-2,38],[12,9.6],[30,9.6],[43,0],[52,-18],[78,-22],[80,-36],[57,-36],[20,-9],[-10,-9],[-25,-26],[-45,-9],[-69,0]];
+const rcTex = canvasTex(64, 112, g => { g.fillStyle = '#fbfbf4'; g.fillRect(0,0,64,112); g.fillStyle = '#c0392b'; g.font = '900 13px sans-serif'; g.textAlign = 'center'; g.fillText('統一發票', 32, 18);
+  g.fillStyle = '#555'; for (let y=30; y<100; y+=9) g.fillRect(8, y, 20 + ((y*7)%28), 3); });
+const receipts = RCPT.map(([x,z], k) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(.38, .66), new THREE.MeshBasicMaterial({map:rcTex, side:THREE.DoubleSide}));
+  m.position.set(x, 1, z); m.userData.k = k; m.userData.dyn = true; scene.add(m); return m; });
+
+// ---------- 室內 ----------
+const ROOMS = {};
+const tileTex = (a, b) => { const t = canvasTex(64, 64, g => { g.fillStyle = a; g.fillRect(0,0,64,64); g.fillStyle = b; g.fillRect(0,0,32,32); g.fillRect(32,32,32,32); }); t.wrapS = t.wrapT = THREE.RepeatWrapping; return t; };
+function room(key, ox, oz, w, d, name, wallCol, tiles) {
+  const r = {key, ox, oz, w, d, name, acts:[]};
+  const L = (x, z) => [ox + x, oz + z];
+  r.L = L;
+  const ft = tileTex(...tiles); ft.repeat.set(w/1.2, d/1.2);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshStandardMaterial({map:ft, roughness:.5})); fl.rotation.x = -Math.PI/2; fl.position.set(ox, .02, oz); scene.add(fl);
+  const H = 3.6, wm = mat(wallCol);
+  const wall = (x1, x2, z1, z2) => { solid(ox+x1, ox+x2, oz+z1, oz+z2, H); const m = new THREE.Mesh(new THREE.BoxGeometry(x2-x1, H, z2-z1), wm); m.position.set(ox+(x1+x2)/2, H/2, oz+(z1+z2)/2); scene.add(m); };
+  wall(-w/2-.3, w/2+.3, -d/2-.3, -d/2); wall(-w/2-.3, -w/2, -d/2, d/2+.3); wall(w/2, w/2+.3, -d/2, d/2+.3);
+  wall(-w/2, -1.2, d/2, d/2+.3); wall(1.2, w/2, d/2, d/2+.3);
+  solid(ox-1.2, ox+1.2, oz+d/2, oz+d/2+.3, H);
+  const dr = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.6), new THREE.MeshStandardMaterial({color:0x9fc8d8, transparent:true, opacity:.5})); dr.position.set(ox, 1.3, oz+d/2+.1); dr.rotation.y = Math.PI; scene.add(dr);
+  camBoxes.push(new THREE.Box3(new THREE.Vector3(ox-w/2-.3, H-.2, oz-d/2-.3), new THREE.Vector3(ox+w/2+.3, H+.3, oz+d/2+.3)));
+  const ce = new THREE.Mesh(new THREE.PlaneGeometry(w+.6, d+.6), mat(0xa8a8a2)); ce.rotation.x = Math.PI/2; ce.position.set(ox, H, oz); scene.add(ce);
+  for (let x=-w/2+2; x<w/2-1; x+=4) for (let z=-d/2+2; z<d/2-1; z+=4) { const pn = new THREE.Mesh(new THREE.BoxGeometry(1.6, .05, .5), glow(0xffffff)); pn.position.set(ox+x, H-.03, oz+z); scene.add(pn); }
+  r.box = (x1, x2, z1, z2, h, c, coll=true) => { if (coll) solid(ox+x1, ox+x2, oz+z1, oz+z2, h); const m = new THREE.Mesh(new THREE.BoxGeometry(x2-x1, h, z2-z1), mat(c)); m.position.set(ox+(x1+x2)/2, h/2, oz+(z1+z2)/2); scene.add(m); return m; };
+  r.goods = (x1, x2, z, y, n, face=1) => { for (let i=0; i<n; i++) { const g = new THREE.Mesh(new THREE.BoxGeometry((x2-x1)/n*.8, rand(.18,.32), .22), mat([0xd84a3a,0xe8c040,0x3a8ad8,0x4ab86a,0xe88a3a,0xf0f0f0,0x8a4ad8][(Math.random()*7)|0])); g.position.set(ox + x1 + (i+.5)*(x2-x1)/n, y + g.geometry.parameters.height/2, oz + z); scene.add(g); } };
+  r.label = (t, c, x, y, z, ry=0, sc=.35, hang) => { const m = sign(t, c, ox+x, y, oz+z, ry, {scale:sc});
+    if (hang) { const w = m.geometry.parameters.width, hh = m.geometry.parameters.height; for (const s of [-1, 1]) { const rd = new THREE.Mesh(new THREE.CylinderGeometry(.015, .015, H - y - hh/2, 4), mat(0x555555)); rd.position.set(ox + x + Math.cos(ry)*s*w*.35, (H + y + hh/2)/2, oz + z - Math.sin(ry)*s*w*.35); scene.add(rd); } }
+    return m; };
+  ROOMS[key] = r; return r;
+}
+
+// 便利商店
+{
+  const n0 = scene.children.length;
+  const r = room('cvs', 300, 0, 14, 12, '便利商店', 0xe0ded6, ['#e0e0dc','#cfcfca']);
+  r.box(2.5, 6.6, -4, -2.8, 1, 0xe0ded8); r.box(2.5, 6.6, -2.85, -2.75, .2, 0x1f8a5c, false).position.y = .7;
+  const reg = r.box(4.8, 5.4, -3.6, -3.1, .35, 0x333333, false); reg.position.y = 1.18;
+  r.label('結帳', '#1f8a5c', 5.1, 2.8, -3.4, 0, .45, true);
+  const pot = new THREE.Group();
+  const pb = new THREE.Mesh(new THREE.CylinderGeometry(.38, .34, .32, 18), mat(0x888888, {metalness:.7, roughness:.3})); pot.add(pb);
+  const liq = new THREE.Mesh(new THREE.CircleGeometry(.35, 18), mat(0x3a2210)); liq.rotation.x = -Math.PI/2; liq.position.y = .14; pot.add(liq);
+  for (let i=0; i<7; i++) { const e = new THREE.Mesh(new THREE.SphereGeometry(.07, 8, 6), mat(0x6a3a18)); e.scale.y = 1.25; e.position.set(Math.cos(i)*.2*(i%2+.5), .16, Math.sin(i)*.2*(i%2+.5)); pot.add(e); }
+  pot.position.set(r.ox + 3, 1.16, r.oz - 3.3); scene.add(pot);
+  r.label('茶葉蛋 13元', '#7a3b2a', 3, .8, -2.73, 0, .22);
+  r.steam = [0,1,2].map(i => { const m = new THREE.Mesh(new THREE.SphereGeometry(.12, 8, 6), new THREE.MeshBasicMaterial({color:0xffffff, transparent:true, opacity:.35})); m.position.set(r.ox+3, 1.4, r.oz-3.3); m.userData.k = i; m.userData.dyn = true; scene.add(m); return m; });
+  const clerk = person({shirt:0x1f8a5c, hair:0x201510}); clerk.position.set(r.ox + 4.8, 0, r.oz - 4.9); scene.add(clerk); r.clerk = clerk;
+  r.box(-6.6, -.5, -6, -5.1, 2.3, 0xd8dce0);
+  const glass = new THREE.Mesh(new THREE.PlaneGeometry(6, 2.1), new THREE.MeshStandardMaterial({color:0xbfe4ff, transparent:true, opacity:.25, roughness:.1})); glass.position.set(r.ox - 3.55, 1.15, r.oz - 5.08); scene.add(glass);
+  for (const y of [.35, .85, 1.35, 1.85]) r.goods(-6.4, -.7, -5.5, y, 10);
+  const eggs = (x, c) => { for (let i=0; i<6; i++) { const e = new THREE.Mesh(new THREE.SphereGeometry(.07, 8, 6), mat(c)); e.scale.y = 1.25; e.position.set(r.ox + x - .2 + (i%3)*.2, 1.12, r.oz - 5.3 + Math.floor(i/3)*.16); scene.add(e); } };
+  eggs(-4.8, 0xf4f0e6); eggs(-2.4, 0xd8904a);
+  r.label('溫泉蛋 39元', '#d8641c', -4.8, 1.75, -5.04, 0, .25); r.label('糖心蛋 45元', '#d8641c', -2.4, 1.75, -5.04, 0, .25);
+  for (const z of [-2, 1.2]) { r.box(-6, -2, z, z+.6, 1.5, 0xb8bcc4); for (const y of [.4, .9, 1.5]) { r.goods(-5.9, -2.1, z-.05, y, 9); r.goods(-5.9, -2.1, z+.65, y, 9); } }
+  const wet = new THREE.Mesh(new THREE.PlaneGeometry(4, 4), new THREE.MeshStandardMaterial({color:0x9fd0ff, transparent:true, opacity:.35, roughness:.05, metalness:.3})); wet.rotation.x = -Math.PI/2; wet.position.set(r.ox + 1.5, .04, r.oz + .5); scene.add(wet);
+  const wt = canvasTex(128, 160, g => { g.fillStyle = '#ffd400'; g.fillRect(0,0,128,160); g.fillStyle = '#111'; g.font = '900 30px "Noto Sans TC", sans-serif'; g.textAlign = 'center'; g.fillText('小心', 64, 60); g.fillText('地滑', 64, 100); g.font = '700 16px sans-serif'; g.fillText('CAUTION', 64, 135); });
+  const ws = new THREE.Group();
+  for (const a of [-.25, .25]) { const pnl = new THREE.Mesh(new THREE.PlaneGeometry(.5, .75), new THREE.MeshStandardMaterial({map:wt, side:THREE.DoubleSide})); pnl.rotation.x = a; pnl.position.set(0, .37, a > 0 ? -.09 : .09); ws.add(pnl); }
+  ws.position.set(r.ox - .8, 0, r.oz + 2.8); scene.add(ws);
+  r.box(3.8, 4.3, 2.8, 3.3, .5, 0x3a6ab8);
+  r.box(-6.9, -6, 3.6, 5, 1.8, 0x5a6a7a);
+  r.label('ATM', '#1c5fb8', -6.45, 1.5, 3.57, Math.PI, .3);
+  r.spawn = [0, 3.6, Math.PI];
+  r.wet = [-.5, 3.5, -1.5, 2.5];
+  scene.children.slice(n0).forEach(o => o.userData.noShadow = true);
+}
+// 超市
+{
+  const n0 = scene.children.length;
+  const r = room('mkt', 300, 60, 18, 16, '好鄰居超市', 0xeae2d2, ['#d8d4cc','#c8c4bc']);
+  const shelfs = [[-7.6,-6.6],[-3.4,-2.6],[.6,1.4]];
+  for (const [a,b] of shelfs) { r.box(a, b, -6.5, 3, 1.9, 0xc8c0b0); for (const y of [.4, 1, 1.6]) for (let z=-6.2; z<2.8; z+=3) { r.goods(a+.05, b-.05, z, y, 3); } }
+  r.box(-8.95, -8.4, -7.5, 4, 2, 0xc8c0b0);
+  for (const [t, x] of [['調味料', -5], ['餅乾零食', -1], ['飲料', 3.4]]) { const sg = r.label(t, '#d8641c', x, 3.0, -1.5, 0, .45, true); }
+  for (let z=-6; z<2.5; z+=.6) for (const y of [.42, 1.02]) { const b = new THREE.Mesh(new THREE.CylinderGeometry(.07, .08, .32, 8), mat(0x3a1a0a)); b.position.set(r.ox - 6.5, y + .16, r.oz + z); scene.add(b);
+    const c = new THREE.Mesh(new THREE.CylinderGeometry(.04, .04, .06, 8), mat([0xc0392b,0xe0b020,0x2a8a4a][(Math.abs(z*10)|0)%3])); c.position.set(r.ox - 6.5, y + .35, r.oz + z); scene.add(c); }
+  r.box(-4, 8.6, -7.9, -7.2, 2.2, 0xd8dce0);
+  for (const y of [.5, 1.1, 1.7]) r.goods(-3.8, 8.4, -7.1, y, 18);
+  r.box(5, 6.2, 2, 6, 1, 0xe8e4dc); r.label('收銀台', '#d8641c', 5.6, 2.8, 4, Math.PI/2, .4, true);
+  const cashier = person({shirt:0xd8641c, hair:0x3a2a1a}); cashier.position.set(r.ox + 7.2, 0, r.oz + 4); cashier.rotation.y = -Math.PI/2; scene.add(cashier);
+  for (let i=0; i<4; i++) r.box(-7.5 + i*1.3, -6.5 + i*1.3, 5.5, 6.8, .8, [0xe8b020,0xd84a3a,0x6ab84a,0xe88a3a][i]);
+  const aunt = person({shirt:0xb04a6a, hair:0x4a3a2a, pants:0x3a3a5a}); aunt.position.set(r.ox - 6.1, 0, r.oz + 3.9); aunt.rotation.y = Math.PI/2; scene.add(aunt);
+  r.box(-7.4, -6.6, 3.4, 4.4, .95, 0xf0f0f0);
+  const ab = bubble('帥哥～吃吃看！', '#b04a6a'); ab.position.y = 2.25; ab.scale.set(1.6, .4, 1); aunt.add(ab); r.aunt = aunt;
+  const cart = new THREE.Group();
+  const bk = new THREE.Mesh(new THREE.BoxGeometry(.6, .5, .9), new THREE.MeshStandardMaterial({color:0xb8bcc4, metalness:.8, roughness:.3, wireframe:true})); bk.position.y = .75; cart.add(bk);
+  const bs = new THREE.Mesh(new THREE.BoxGeometry(.6, .03, .9), mat(0x8a8e96)); bs.position.y = .5; cart.add(bs);
+  const hd = new THREE.Mesh(new THREE.BoxGeometry(.6, .05, .05), mat(0xd84a3a)); hd.position.set(0, 1.05, -.5); cart.add(hd);
+  for (const x of [-.25, .25]) for (const z of [-.38, .38]) { const w = new THREE.Mesh(new THREE.SphereGeometry(.07, 6, 6), mat(0x111)); w.position.set(x, .07, z); cart.add(w); }
+  scene.add(cart); r.cart = cart;
+  r.spawn = [0, 5.6, Math.PI];
+  scene.children.slice(n0).forEach(o => o.userData.noShadow = true);
+}
+
+// 陳媽媽家
+const chenMom = person({shirt:0x8a3a6a, hair:0x3a2420, pants:0x3a3a4a});
+{
+  const n0 = scene.children.length;
+  const r = room('chen', 300, 120, 12, 10, '陳媽媽家', 0xeadcc0, ['#a8784a','#9a6c40']);
+  r.box(-3, 3, -4.6, -3.6, .45, 0x7a4a3a); r.box(-3, 3, -5, -4.6, 1.1, 0x6a3e30); r.box(-3.4, -3, -5, -3.6, .7, 0x6a3e30); r.box(3, 3.4, -5, -3.6, .7, 0x6a3e30);
+  r.box(-1.2, 1.2, -2.5, -1.7, .45, 0x8a5a30);
+  for (const x of [-.4, .3]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.06, .05, .1, 10), mat(0xf0f0e8)); c.position.set(r.ox + x, .5, r.oz - 2.1); scene.add(c); }
+  r.box(-6, -5.4, -1.8, 1.8, .6, 0x5a3a24); const tv = r.box(-5.8, -5.7, -1.2, 1.2, 1.3, 0x111111, false); tv.position.y = 1.35;
+  r.box(5.2, 6, -1.5, 1.5, 1, 0xa82a1a);
+  const god = new THREE.Mesh(new THREE.CylinderGeometry(.18, .22, .7, 10), mat(0xd8a830, {metalness:.6})); god.position.set(r.ox + 5.6, 1.35, r.oz); scene.add(god);
+  for (const z of [-1, 1]) { const l = new THREE.Mesh(new THREE.SphereGeometry(.12, 8, 6), glow(0xff3a2a)); l.position.set(r.ox + 5.6, 1.4, r.oz + z); scene.add(l); }
+  r.box(3.6, 5.6, -5, -4.6, 2, 0x8a5a30);
+  for (let i=0; i<4; i++) { const tr = new THREE.Mesh(new THREE.CylinderGeometry(.1, .14, .4, 8), mat(0xe0b030, {metalness:.7, roughness:.3})); tr.position.set(r.ox + 3.9 + i*.5, 2.22, r.oz - 4.8); scene.add(tr); }
+  const ph = canvasTex(256, 200, g => { g.fillStyle = '#6a4a2a'; g.fillRect(0,0,256,200); g.fillStyle = '#e8e4f0'; g.fillRect(12,12,232,176);
+    g.fillStyle = '#1a1a3a'; g.fillRect(100,70,56,80); g.beginPath(); g.arc(128,58,22,0,7); g.fillStyle = '#f1c9a5'; g.fill(); g.fillStyle = '#111'; g.fillRect(100,30,56,8); g.fillRect(120,22,16,10);
+    g.fillStyle = '#c0392b'; g.font = '900 22px "Noto Sans TC", sans-serif'; g.textAlign = 'center'; g.fillText('賀 志豪 台大醫學系', 128, 176); });
+  const pf = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.1), new THREE.MeshLambertMaterial({map:ph})); pf.position.set(r.ox, 2.3, r.oz - 4.98); scene.add(pf);
+  r.label('志豪 鋼琴檢定 十級', '#c0392b', 4.6, 2.75, -4.58, 0, .22);
+  r.box(-5.8, -4.6, 3.6, 4.7, 1, 0x8a6a4a);
+  chenMom.position.set(r.ox + 1.8, 0, r.oz - 1.2); chenMom.rotation.y = Math.PI/2*.5; scene.add(chenMom);
+  r.spawn = [0, 3.2, Math.PI];
+  scene.children.slice(n0).forEach(o => { if (o !== chenMom) o.userData.noShadow = true; });
+}
+// 阿明家
+const homeMom = person({shirt:0xd06a7a, hair:0x2a1a14, pants:0x4a4a5a});
+{
+  const apron = new THREE.Mesh(new THREE.BoxGeometry(.5, .6, .05), mat(0xf0e8d0)); apron.position.set(0, .95, .3); homeMom.add(apron);
+  const n0 = scene.children.length;
+  const r = room('home', 300, -60, 12, 10, '阿明家', 0xf0e6d0, ['#b8885a','#a87a4e']);
+  r.box(-3, 1, -4.6, -3.6, .45, 0x4a6a8a); r.box(-3, 1, -5, -4.6, 1.1, 0x3a5a7a);
+  r.box(-1.6, .2, -2.6, -1.9, .4, 0x8a6a4a);
+  const ctl = new THREE.Mesh(new THREE.BoxGeometry(.3, .06, .15), mat(0x222222)); ctl.position.set(r.ox - .7, .45, r.oz - 2.25); scene.add(ctl);
+  r.box(-6, -5.4, -2.2, 1.2, .6, 0x5a3a24); const tv = r.box(-5.8, -5.7, -1.6, .8, 1.3, 0x111111, false); tv.position.y = 1.35;
+  const scr = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.1), glow(0x3a8ad8)); scr.position.set(r.ox - 5.64, 1.35, r.oz - .4); scr.rotation.y = Math.PI/2; scene.add(scr);
+  r.box(5.2, 6, -4, -1, 1, 0xa82a1a);
+  const god = new THREE.Mesh(new THREE.CylinderGeometry(.18, .22, .7, 10), mat(0xd8a830, {metalness:.6})); god.position.set(r.ox + 5.6, 1.35, r.oz - 2.5); scene.add(god);
+  r.box(2, 4.4, 1, 2.6, .78, 0x9a6a3a);
+  const ck = new THREE.Mesh(new THREE.CylinderGeometry(.25, .25, .35, 12), mat(0xc0392b)); ck.position.set(r.ox + 3.6, .96, r.oz + 1.8); scene.add(ck);
+  const cal = canvasTex(128, 160, g => { g.fillStyle = '#fff'; g.fillRect(0,0,128,160); g.fillStyle = '#c0392b'; g.fillRect(0,0,128,40); g.fillStyle = '#fff'; g.font = '900 28px sans-serif'; g.textAlign = 'center'; g.fillText('10 月', 64, 30);
+    g.fillStyle = '#333'; g.font = '14px sans-serif'; for (let i=0; i<28; i++) g.fillText(i+1, 12 + (i%7)*17, 60 + Math.floor(i/7)*24); });
+  const cm = new THREE.Mesh(new THREE.PlaneGeometry(.6, .75), new THREE.MeshLambertMaterial({map:cal})); cm.position.set(r.ox + 2, 2.2, r.oz - 4.98); scene.add(cm);
+  r.box(-6, -3, 1.85, 2, 3.6, 0xe8e0cc); r.box(-3.15, -3, 2, 2.6, 3.6, 0xe8e0cc); r.box(-3.15, -3, 3.7, 5, 3.6, 0xe8e0cc);
+  const bt = tileTex('#e8f0f4', '#9ec4d8'); bt.repeat.set(4, 4);
+  const bf = new THREE.Mesh(new THREE.PlaneGeometry(2.85, 3), new THREE.MeshLambertMaterial({map:bt})); bf.rotation.x = -Math.PI/2; bf.position.set(r.ox - 4.55, .04, r.oz + 3.5); scene.add(bf);
+  const bw = new THREE.Mesh(new THREE.PlaneGeometry(3, 1.4), new THREE.MeshLambertMaterial({map:bt})); bw.position.set(r.ox - 5.98, .7, r.oz + 3.5); bw.rotation.y = Math.PI/2; scene.add(bw);
+  r.box(-6, -5.45, 2.3, 3.3, .85, 0xf0f0f0);
+  const sink = new THREE.Mesh(new THREE.BoxGeometry(.4, .1, .6), mat(0xb8c8d0, {metalness:.5})); sink.position.set(r.ox - 5.7, .87, r.oz + 2.8); scene.add(sink);
+  const tap = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .35, 6), mat(0xc8c8c8, {metalness:.8})); tap.position.set(r.ox - 5.9, 1.05, r.oz + 2.8); scene.add(tap);
+  const soap = new THREE.Mesh(new THREE.BoxGeometry(.08, .2, .12), mat(0x6ac8a8)); soap.position.set(r.ox - 5.85, .97, r.oz + 3.2); scene.add(soap);
+  const mir = new THREE.Mesh(new THREE.PlaneGeometry(.9, .8), new THREE.MeshStandardMaterial({color:0xcfe0ea, metalness:.9, roughness:.1})); mir.position.set(r.ox - 5.97, 1.75, r.oz + 2.8); mir.rotation.y = Math.PI/2; scene.add(mir);
+  r.box(-5.6, -5.0, 4.0, 4.6, .45, 0xf4f4f4); r.box(-5.95, -5.6, 3.95, 4.65, 1.0, 0xf4f4f4);
+  const seat = new THREE.Mesh(new THREE.BoxGeometry(.55, .05, .55), mat(0xe8e8e8)); seat.position.set(r.ox - 5.3, .48, r.oz + 4.3); scene.add(seat);
+  const tw = new THREE.Mesh(new THREE.BoxGeometry(.05, .5, .35), mat(0x6aa8d8)); tw.position.set(r.ox - 3.2, 1.3, r.oz + 4.4); scene.add(tw);
+  homeMom.position.set(r.ox + 1.6, 0, r.oz - .8); homeMom.rotation.y = -Math.PI*.75; scene.add(homeMom);
+  r.spawn = [0, 3.2, Math.PI];
+  scene.children.slice(n0).forEach(o => { if (o !== homeMom) o.userData.noShadow = true; });
+}
+
+// 可以搭話的路人
+const NPCS = [
+  {name:'宅宅', at:[22, 11], ry:Math.PI, look:{shirt:0x2a2a2a, pants:0x3a4a6a}, text:'欸，11 月到底要先玩 GTA6 還是時之笛？我的錢只夠買一片。', opts:[
+    ['GTA6', '對吧！可是我怕我的顯卡跑不動……算了，我先存錢。'],
+    ['時之笛', '經典就是經典！不過那個水之神殿我到現在還有陰影。'],
+    ['都不要，去念書', '……你講話好像我媽。']]},
+  {name:'阿伯', at:[-39.5, 11.2], ry:Math.PI, look:{shirt:0xe8e0d0, pants:0x4a4a3a, hair:0xcccccc}, sit:true, text:'少年仔，台積電今天又漲了，你有買嗎？', opts:[
+    ['有', '有眼光！阿伯當年三十塊的時候沒買，後悔到現在。'],
+    ['沒有', '少年人要學理財啦！不然以後怎麼買房子？'],
+    ['什麼是台積電？', '……你是哪一國的人？']]},
+  {name:'外送員', at:[-8, -9.4], ry:0, look:{shirt:0x2fa860, pants:0x2a2a2a}, text:'不好意思，你知道信義路五段 7 號在哪嗎？我已經繞第三圈了。', opts:[
+    ['在那邊', '謝啦！（他騎往完全相反的方向）'],
+    ['不知道', '唉，今天第 37 單了，客人還一直催……'],
+    ['你看導航啊', '導航叫我騎進河裡耶！']]},
+  {name:'發問卷的人', at:[76, -24], ry:Math.PI/2, look:{shirt:0xf0f0f0, pants:0x2a2a4a}, text:'同學，可以耽誤你五分鐘做個問卷嗎？', opts:[
+    ['好啊', '……三十分鐘後，你填完了一份八頁的問卷。', () => { S.time += 20; }],
+    ['不用了謝謝', '那給你一張傳單就好！'],
+    ['（假裝講電話）', '你假裝在講電話……結果媽媽真的打來了。', () => { S.nextCall = .5; }]]},
+  {name:'日本觀光客', at:[96, -22], ry:-Math.PI/2, look:{shirt:0xd84a6a, pants:0xe8e0d0}, text:'すみません！101 はどこですか？', opts:[
+    ['（指向背後那棟超高的樓）', 'あっ……こんなに大きい！ありがとう！'],
+    ['I don\'t know', 'えっ……目の前ですけど……'],
+    ['阿里嘎多', '……？？？']]},
+  {name:'健身哥', at:[102, -42], ry:-Math.PI/2, look:{shirt:0x111111, pants:0x2a2a2a}, text:'兄弟，你有在練嗎？', opts:[
+    ['有', '看得出來！不過你的肩膀還可以再加強，今天練腿嗎？'],
+    ['沒有', '人生苦短，要多深蹲！來，做十下給我看。（你做了十下深蹲）', () => { S.time += 5; }],
+    ['我只想回家', '回家也要練啊！']]},
+  {name:'直播主', at:[84, -49], ry:0, look:{shirt:0xffc0d0, pants:0xe8e8e8}, text:'家人們！今天我們來到 101！欸這位路人，跟大家打個招呼！', opts:[
+    ['大家好！', '好有活力！家人們幫他按個愛心！'],
+    ['（遮臉跑走）', '他害羞了啦，家人們～'],
+    ['可以不要拍我嗎', '好啦好啦，幫你上馬賽克～']]},
+  {name:'補習班工讀生', at:[33.5, 11], ry:Math.PI, look:{shirt:0xd84a3a, pants:0x2a2a3a}, text:'同學！要不要考研究所？我們有資工所保證班喔！', opts:[
+    ['我已經考上了', '那要不要先報名博士班先修班？'],
+    ['我才大學', '大學就要開始準備了！現在報名打八折！'],
+    ['（收下傳單）', '你收下一張傳單，背面是空白的，可以拿來算數學。']]},
+  {name:'辦卡的姊姊', at:[27, 10.8], ry:Math.PI, look:{shirt:0x1c5fb8, pants:0x2a2a2a}, text:'先生！辦信用卡送行李箱喔！', opts:[
+    ['好啊', '請問您的年收入是……你是學生喔？那不好意思。'],
+    ['不用了', '辦一張嘛，行李箱很大喔！可以裝下你所有的夢想！']]}
+];
+function makeNPC(n) {
+  const o = person({hair:0x221a12, ...n.look});
+  o.position.set(n.at[0], n.sit ? -.25 : 0, n.at[1]); o.rotation.y = n.ry; scene.add(o); n.obj = o;
+  if (n.sit) { o.userData.legL.rotation.x = o.userData.legR.rotation.x = -1.5; const st = new THREE.Mesh(new THREE.CylinderGeometry(.22, .22, .45, 10), mat(0xc0392b)); st.position.set(n.at[0], .22, n.at[1] - .1); scene.add(st); }
+  const b = bubble('…', '#888'); b.scale.set(.7, .35, 1); b.position.y = 2.25; o.add(b); n.bub = b;
+}
+NPCS.forEach(makeNPC);
+function nearNPC() {
+  if (S.room) return null;
+  const p = player.position;
+  return NPCS.find(n => Math.hypot(n.at[0] - p.x, n.at[1] - p.z) < 2.2) || null;
+}
+function talkNPC(n) {
+  n.obj.lookAt(player.position.x, n.obj.position.y, player.position.z);
+  choice(n.name, n.text, n.opts.map(([l, r, fx]) => [l, () => { fx && fx(); if (n.side) achieve(n.side); if (S.mode === 'dead') return; choice(n.name, r, [['（離開）', () => endChoice()]]); }]));
+}
+
+// ======================= 下午篇：公館 → 台科大 =======================
+const GX = -600, GZ = 0;
+const gp = (x, z) => [GX + x, GZ + z];
+const KU0 = [1100/Math.hypot(1100, 1000), -1000/Math.hypot(1100, 1000)], KN = [-KU0[1], KU0[0]];
+const KC0 = gp(190, 70), CO = [KC0[0] + KN[0]*15, KC0[1] + KN[1]*15];
+const cw = (u, v) => [CO[0] - KU0[0]*u + KN[0]*v, CO[1] - KU0[1]*u + KN[1]*v];
+const cpx = (px, py) => cw((px - 880)*.13, (1000 - py)*.13);
+const CANG = Math.atan2(KU0[1], -KU0[0]);
+const T4DOOR = cpx(620, 828);
+const LEG = [gp(0,0), gp(115,-19), KC0, CO, T4DOOR];
+const RD = [50/Math.hypot(50, 220), 220/Math.hypot(50, 220)], RE = [RD[1], -RD[0]], RC = gp(-22, 0);
+const rw = (t, o) => [RC[0] + RD[0]*t + RE[0]*o, RC[1] + RD[1]*t + RE[1]*o];
+const RANG = Math.atan2(-RD[1], RD[0]);
+function along(i, t, off) { const a = LEG[i], b = LEG[i+1], L = Math.hypot(b[0]-a[0], b[1]-a[1]), ux = (b[0]-a[0])/L, uz = (b[1]-a[1])/L; return [a[0] + ux*t - uz*off, a[1] + uz*t + ux*off]; }
+function segInfo(a, b, p) { const dx = b[0]-a[0], dz = b[1]-a[1], L = Math.hypot(dx, dz), ux = dx/L, uz = dz/L, vx = p.x-a[0], vz = p.z-a[1]; return {t:vx*ux + vz*uz, off:-vx*uz + vz*ux, L, ux, uz}; }
+const segAng = (a, b) => Math.atan2(-(b[1]-a[1]), b[0]-a[0]);
+function rsolid(cx, cz, w, d, ang, h=3) {
+  rsolids.push({cx, cz, hw:w/2, hd:d/2, c:Math.cos(ang), s:Math.sin(ang), h});
+  const ex = Math.abs(Math.cos(ang))*w/2 + Math.abs(Math.sin(ang))*d/2, ez = Math.abs(Math.sin(ang))*w/2 + Math.abs(Math.cos(ang))*d/2;
+  camBoxes.push(new THREE.Box3(new THREE.Vector3(cx-ex, 0, cz-ez), new THREE.Vector3(cx+ex, h, cz+ez)));
+}
+function rbox(cx, cz, w, d, h, ang, m, coll=true, y0=0) {
+  const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(cx, y0 + h/2, cz); b.rotation.y = ang; scene.add(b);
+  if (coll) rsolid(cx, cz, w, d, ang, y0 + h); return b;
+}
+function strip(a, b, w, m, y=.03) {
+  const dx = b[0]-a[0], dz = b[1]-a[1], L = Math.hypot(dx, dz);
+  const g = new THREE.Mesh(new THREE.PlaneGeometry(L, w), m); g.rotation.order = 'YXZ'; g.rotation.set(-Math.PI/2, Math.atan2(-dz, dx), 0);
+  g.position.set((a[0]+b[0])/2, y, (a[1]+b[1])/2); scene.add(g); return g;
+}
+function bike(c) {
+  const g = new THREE.Group(), dark = mat(0x222222), fr = mat(c, {metalness:.4});
+  for (const x of [-.55, .55]) { const w = new THREE.Mesh(new THREE.TorusGeometry(.33, .04, 6, 14), dark); w.position.set(x, .35, 0); g.add(w); }
+  const a = new THREE.Mesh(new THREE.BoxGeometry(1.1, .05, .05), fr); a.position.set(0, .6, 0); a.rotation.z = -.15; g.add(a);
+  const b = new THREE.Mesh(new THREE.BoxGeometry(.05, .5, .05), fr); b.position.set(-.15, .55, 0); g.add(b);
+  const st = new THREE.Mesh(new THREE.BoxGeometry(.3, .06, .14), dark); st.position.set(-.18, .84, 0); g.add(st);
+  const hb = new THREE.Mesh(new THREE.BoxGeometry(.06, .06, .55), dark); hb.position.set(.5, .95, 0); g.add(hb);
+  const hs = new THREE.Mesh(new THREE.BoxGeometry(.05, .4, .05), fr); hs.position.set(.5, .75, 0); g.add(hs);
+  const bk = new THREE.Mesh(new THREE.BoxGeometry(.32, .22, .3), mat(0x9a9a9a)); bk.position.set(.72, .85, 0); g.add(bk);
+  return bakeGroup(g);
+}
+const ntuMat = (() => { const t = wallTex[2].map.clone(); t.needsUpdate = true; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(3, 3); return new THREE.MeshLambertMaterial({map:t}); })();
+const ntustMat = (() => { const t = wallTex[3].map.clone(); t.needsUpdate = true; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(5, 6); return new THREE.MeshLambertMaterial({map:t}); })();
+function hall(p, w, d, h, ang, name, m=ntuMat, signCol='#7a2a1a') {
+  rbox(p[0], p[1], w, d, h, ang, m);
+  rbox(p[0], p[1], w + .6, d + .6, .6, ang, mat(m === ntuMat ? 0x5a4a44 : 0x8a8e94), false, h);
+  if (name) { const s = sign(name, signCol, 0, 0, 0, 0, {scale:.55}); s.rotation.y = ang + Math.PI; s.position.set(p[0], 3.4, p[1]);
+    const nx = -Math.sin(ang), nz = -Math.cos(ang); s.position.x += nx*(d/2 + .05); s.position.z += nz*(d/2 + .05);
+    const s2 = s.clone(); s2.rotation.y = ang; s2.position.set(p[0] - nx*(d/2 + .05), 3.4, p[1] - nz*(d/2 + .05)); scene.add(s2); }
+}
+{
+  const g = new THREE.Mesh(new THREE.PlaneGeometry(520, 380), mat(0x8fa27a)); g.rotation.x = -Math.PI/2; g.position.set(GX + 160, .005, GZ + 40); scene.add(g);
+  solid(GX - 65, GX - 60, GZ - 120, GZ + 210, 6); solid(GX + 385, GX + 390, GZ - 120, GZ + 210, 6);
+  solid(GX - 65, GX + 390, GZ - 125, GZ - 120, 6); solid(GX - 65, GX + 390, GZ + 210, GZ + 215, 6);
+  const asph = mat(0x4a4c52), side = mat(0xb8aca0), white = mat(0xf0f0ea);
+  // 羅斯福路與公館站
+  strip(rw(-120, 0), rw(140, 0), 46, side, .015); strip(rw(-120, 0), rw(140, 0), 28, asph, .02);
+  for (const o of [-2.6, 2.6]) strip(rw(-120, o), rw(140, o), 3.4, mat(0x8a4a3a), .025);
+  for (const o of [-.9, .9]) strip(rw(-120, o), rw(140, o), .25, mat(0xe0c040), .03);
+  for (let t=-118; t<140; t+=8) for (const o of [-8.5, 8.5]) strip(rw(t, o), rw(t + 4, o), .12, white, .03);
+  for (const o of [-13.6, 13.6]) strip(rw(-120, o), rw(140, o), .15, white, .03);
+  rbox(...rw(10, 14.6), 260, .3, 1.1, RANG, mat(0x8890a8, {metalness:.5}));
+  for (const t of [-30, 40]) { rbox(...rw(t, 0), 10, 1.4, .2, RANG, mat(0xb8b8b8), false); const sh = rbox(...rw(t, 0), 8, 1.6, .1, RANG, mat(0x3a8a5a), false, 2.6);
+    for (const dx of [-3.6, 3.6]) rbox(...rw(t + dx, 0), .15, .15, 2.6, RANG, mat(0x888888), false); }
+  const NTU_WALL = mat(0x9a4a36);
+  for (const [t1, t2] of [[-120, 0], [10, 140]]) { const m = rbox(...rw((t1+t2)/2, 22.6), t2 - t1, .6, 2.2, RANG, NTU_WALL); }
+  for (const t of [0, 10]) { rbox(...rw(t, 22.6), 1.4, 1.4, 3.4, RANG, NTU_WALL); }
+  rbox(...rw(5, 22.6), 11.4, 1, .7, RANG, NTU_WALL, false, 3.4);
+  { const [sx, sz] = rw(5, 22); const s1 = sign('國立臺灣大學　舟山路', '#7a2a1a', sx, 3.75, sz, Math.atan2(-RE[0], -RE[1]), {scale:.42}); }
+  const SHOP2 = [['二手書店','#2a5a7a'],['珍珠奶茶','#c0392b'],['藥妝店','#1f8a5c'],['眼鏡行','#1c5fb8'],['牛肉麵','#8a2a1a'],['鞋店','#333333'],['服飾','#b04a8a'],['電影院','#2a2a5a'],['書局','#1c5fb8'],['手搖飲','#d8641c'],['滷味','#8a2a1a'],['3C 用品','#2a2a2a']];
+  for (let k=0; k<12; k++) { const t = -100 + k*20, d = 14, h = 9 + (k%4)*3.2, [bx, bz] = rw(t, -14 - 3 - d/2);
+    rbox(bx, bz, 18, d, h, RANG, new THREE.MeshLambertMaterial({map:wallTex[(k*3)%WALL.length].map}));
+    const [fx, fz] = rw(t, -17.05); const fr = new THREE.Mesh(new THREE.PlaneGeometry(17, 3), new THREE.MeshLambertMaterial({map:FRONT[k%4]})); fr.position.set(fx, 1.5, fz); fr.rotation.y = Math.atan2(RE[0], RE[1]); scene.add(fr);
+    const [n, c] = SHOP2[k]; const sb = sign(n, c, fx, 3.6, fz, Math.atan2(RE[0], RE[1]), {scale:.5}); sb.position.x += RE[0]*.12; sb.position.z += RE[1]*.12;
+    const vs = sign(SHOP2[(k+5)%12][0], SHOP2[(k+5)%12][1], 0, 0, 0, Math.atan2(RD[0], RD[1]), {vert:true, scale:.5}); const [vx, vz] = rw(t + 7, -17.6); vs.position.set(vx, 7.5, vz); }
+  // 2 號出口
+  const EX = rw(10, 18.2);
+  rbox(EX[0], EX[1], 7, 4.2, .2, RANG, mat(0xd8dde0), false, 3.4);
+  for (const [dt, dO] of [[-3.3, -2], [3.3, -2], [-3.3, 2], [3.3, 2]]) { const [x, z] = rw(10 + dt, 18.2 + dO); const pl = new THREE.Mesh(new THREE.CylinderGeometry(.08, .08, 3.4, 6), mat(0x9a9ea4)); pl.position.set(x, 1.7, z); scene.add(pl); }
+  for (const dO of [-2, 2]) rbox(...rw(10, 18.2 + dO), 7, .1, 1.1, RANG, new THREE.MeshLambertMaterial({color:0xbfe0f0, transparent:true, opacity:.5}));
+  rbox(...rw(13.4, 18.2), .1, 4, 3.4, RANG, new THREE.MeshLambertMaterial({color:0xbfe0f0, transparent:true, opacity:.5}));
+  { const esc = rbox(...rw(11, 18.2), 5, 1.6, .15, RANG, mat(0x6a6e74), false, .4); esc.rotation.z = -.25; }
+  { const [x, z] = rw(6.45, 18.2); const s1 = sign('M 公館站 Gongguan　2', '#1f8a5c', x, 2.9, z, Math.atan2(-RD[0], -RD[1]), {scale:.5}); }
+  for (let k=0; k<10; k++) { const [x, z] = rw(16 + k*.9, 20.6); const b = bike(0xf0a020); b.position.set(x, 0, z); b.rotation.y = RANG + Math.PI/2; b.userData.static = true; scene.add(b); }
+  { const [x, z] = rw(14.2, 21.4); sign('YouBike', '#f0a020', x, 1.6, z, Math.atan2(-RE[0], -RE[1]), {scale:.35, fg:'#222'}); }
+  for (const [t, o, c] of [[2, 17, 0x3a5a8a], [4, 19.5, 0xd06a3a], [20, 16.5, 0x6a9a6a], [-14, 18, 0xe0e0e0], [-18, 16, 0xb04a6a], [26, 19, 0x2a2a2a]]) { const pp = person({shirt:c, hair:0x2a1a10}); const [x, z] = rw(t, o); pp.position.set(x, 0, z); pp.rotation.y = rand(0, 6); scene.add(pp); }
+  window.__EX = EX;
+  // 舟山路、校內道路、台科大入口
+  const W = [8, 7, 6];
+  for (let i=0; i<3; i++) { strip(LEG[i], LEG[i+1], W[i] + 6, side, .025); strip(LEG[i], LEG[i+1], W[i], asph, .03); }
+  for (let i=0; i<2; i++) { const L = Math.hypot(LEG[i+1][0]-LEG[i][0], LEG[i+1][1]-LEG[i][1]);
+    for (let t=4; t<L-(i ? 18 : 4); t+=9) for (const s of [-1, 1]) { const [x, z] = along(i, t, s*(W[i]/2 + 1.6)); tree(x, z); }
+    for (let t=6; t<L-(i ? 18 : 6); t+=1.3) if ((t % 26) < 13) { const [x, z] = along(i, t, -(W[i]/2 + 2.6)); const b = bike([0x3a6ab8,0xb02020,0x2a2a2a,0xe8e8e8][(t|0)%4]); b.position.set(x, 0, z); b.rotation.y = segAng(LEG[i], LEG[i+1]) + Math.PI/2; b.userData.static = true; scene.add(b); } }
+  street('舟山路', 'Zhoushan Rd.', GX + 10, 3.2, GZ - 6.5, segAng(LEG[0], LEG[1]));
+  // 台大建築
+  const a1 = segAng(LEG[0], LEG[1]), a2 = segAng(LEG[1], LEG[2]);
+  for (let t=10; t<108; t+=21) { hall(along(0, t, 15), 15, 9, 9 + (t%3)*2, a1, null); if (t < 60 || t > 100) hall(along(0, t, -15), 15, 9, 10, a1, null); }
+  hall(along(0, 40, -15), 15, 9, 9, a1, '女生宿舍');
+  hall(along(1, 14, 13), 14, 9, 7, a2, '鹿鳴堂');
+  hall(along(1, 42, -12), 10, 8, 5, a2, '路易沙咖啡', mat(0xe8e0d0), '#1d6b4a');
+  hall(along(1, 62, 14), 16, 10, 12, a2, '禮賢樓');
+  hall(along(1, 92, 16), 22, 12, 15, a2, '管理學院');
+  { const [x, z] = along(1, 108, -14); const pl = new THREE.Mesh(new THREE.CircleGeometry(9, 20), mat(0xd8d0c0)); pl.rotation.x = -Math.PI/2; pl.position.set(x, .04, z); scene.add(pl);
+    sign('雅頌廣場', '#7a2a1a', x, 1.6, z + 9, 0, {scale:.5}); const ft = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.8, .6, 16), mat(0xa8a8a0)); ft.position.set(x, .3, z); scene.add(ft); solid(x-1.6, x+1.6, z-1.6, z+1.6, .6); }
+  // 社團攤位
+  for (let k=0; k<4; k++) { const [x, z] = along(1, 72 + k*7, -14);
+    rbox(x, z, 3, 1.4, .9, a2, mat(0xf0f0f0)); const tent = rbox(x, z, 3.4, 2.4, .1, a2, mat([0xd84a3a,0x3a8ad8,0x4ab86a,0xe8b020][k]), false, 2.6);
+    for (const [dx, dz] of [[-1.6,-1.1],[1.6,-1.1],[-1.6,1.1],[1.6,1.1]]) { const pl = new THREE.Mesh(new THREE.CylinderGeometry(.04, .04, 2.6, 5), mat(0xaaaaaa)); pl.position.set(x + dx*Math.cos(a2) + dz*Math.sin(a2), 1.3, z - dx*Math.sin(a2) + dz*Math.cos(a2)); scene.add(pl); }
+    const s = sign(['熱舞社','吉他社','動漫社','登山社'][k], ['#d84a3a','#3a8ad8','#4ab86a','#d89a20'][k], x, 2.2, z, a2 + Math.PI/2, {scale:.35}); }
+  // 醉月湖
+  { const [lx, lz] = along(0, 92, -42);
+    const lake = new THREE.Mesh(new THREE.CircleGeometry(16, 28), new THREE.MeshLambertMaterial({color:0x5a8aa8})); lake.rotation.x = -Math.PI/2; lake.position.set(lx, .05, lz); scene.add(lake);
+    const pav = new THREE.Mesh(new THREE.ConeGeometry(3, 1.6, 8), mat(0x8a2a1a)); pav.position.set(lx + 4, 3.6, lz - 3); scene.add(pav);
+    for (const [dx, dz] of [[-1.5,-1.5],[1.5,-1.5],[-1.5,1.5],[1.5,1.5]]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(.12, .12, 2.8, 6), mat(0xb03a2a)); c.position.set(lx + 4 + dx, 1.4, lz - 3 + dz); scene.add(c); }
+    for (let k=0; k<12; k++) { const a = k/12*Math.PI*2; tree(lx + Math.cos(a)*21, lz + Math.sin(a)*21, 1.1); }
+    sign('醉月湖', '#2a5a7a', lx, 1.5, lz + 18, 0, {scale:.5}); }
+  // 基隆路與高架橋
+  const KU = (() => { const L = Math.hypot(1100, -1000); return [1100/L, -1000/L]; })();
+  const KC = LEG[2], kAng = Math.atan2(-KU[1], KU[0]);
+  const kp = (t, off) => [KC[0] + KU[0]*t - KU[1]*off, KC[1] + KU[1]*t + KU[0]*off];
+  window.__K = {KU, KC, kp};
+  strip(kp(-150, 0), kp(150, 0), 30, side, .02); strip(kp(-150, 0), kp(150, 0), 24, asph, .035);
+  for (const o of [-.15, .15]) strip(kp(-150, o), kp(150, o), .12, mat(0xe0c040), .04);
+  for (let t=-148; t<150; t+=8) for (const o of [-6, 6]) strip(kp(t, o), kp(t + 4, o), .12, white, .04);
+  for (let k=-5; k<=5; k++) strip(kp(-2.5, k*2.1), kp(2.5, k*2.1), 1, white, .045);
+  rbox(...kp(0, 0), 300, 12, 1, kAng, mat(0x9a9ea4), false, 9);
+  for (let t=-140; t<150; t+=18) if (Math.abs(t) > 6) rbox(...kp(t, 0), 1.6, 1.6, 9, kAng, mat(0x9a9ea4));
+  for (const s of [-1, 1]) for (const [t1, t2] of [[-150, -4], [4, 150]]) rbox(...kp((t1+t2)/2, s*12.3), t2 - t1, .3, 1.2, kAng, mat(0x8890a8, {metalness:.5}));
+  { const [sx, sz] = kp(-6, 14.5); street('基隆路四段', 'Keelung Rd., Sec. 4', sx, 3.2, sz, kAng); }
+  // 台科大（依照校園平面配置圖）
+  { const cplane = (x1, y1, x2, y2, c, y=.03) => { const [cx, cz] = cpx((x1+x2)/2, (y1+y2)/2); const m = new THREE.Mesh(new THREE.PlaneGeometry((x2-x1)*.13, (y2-y1)*.13), mat(c)); m.rotation.order = 'YXZ'; m.rotation.set(-Math.PI/2, CANG, 0); m.position.set(cx, y, cz); scene.add(m); return m; };
+    const cfence = (x1, y1, x2, y2) => { const a = cpx(x1, y1), b = cpx(x2, y2), L = Math.hypot(b[0]-a[0], b[1]-a[1]); rbox((a[0]+b[0])/2, (a[1]+b[1])/2, L, .3, 1.4, Math.atan2(-(b[1]-a[1]), b[0]-a[0]), mat(0x6a6e74)); };
+    cplane(115, 330, 1275, 1000, 0xd4cec2, .02);
+    cfence(115, 1000, 855, 1000); cfence(905, 1000, 1275, 1000); cfence(1275, 1000, 1275, 330); cfence(1275, 330, 115, 330); cfence(115, 330, 115, 1000);
+    cplane(805, 505, 960, 740, 0x7aa05a); cplane(650, 520, 705, 610, 0x6aaac8, .04);
+    cplane(240, 855, 480, 970, 0xb8463a); cplane(285, 878, 435, 948, 0x6a9a4a, .035);
+    cplane(228, 780, 345, 850, 0x8a6a4a); cplane(360, 780, 475, 850, 0x3a7a5a); cplane(270, 675, 380, 750, 0xc8a878); cplane(210, 480, 345, 550, 0x5a9ac8);
+    const NM = [ntustMat, new THREE.MeshLambertMaterial({color:0xd8d4cc}), new THREE.MeshLambertMaterial({color:0x8a9aa0}), new THREE.MeshLambertMaterial({color:0xb8a890})];
+    const B = (x1, y1, x2, y2, h, name, m=0) => hall(cpx((x1+x2)/2, (y1+y2)/2), (x2-x1)*.13, (y2-y1)*.13, h, CANG, name, NM[m], '#2a3a5a');
+    B(510, 775, 730, 822, 24, 'T4 第四教學大樓');
+    B(510, 830, 545, 975, 20, 'T1 第一教學大樓');
+    B(550, 905, 690, 985, 22, 'RB 綜合研究大樓', 3); B(690, 835, 775, 985, 16, '圖書館', 3); B(580, 840, 640, 885, 8, 'AU 視聽館', 1);
+    B(805, 785, 985, 832, 18, 'AD 行政大樓', 1);
+    B(975, 860, 1150, 985, 26, 'IB 國際大樓', 2); B(1110, 780, 1150, 860, 30, null, 2);
+    B(550, 505, 615, 740, 18, 'E1 工程一館'); B(695, 505, 760, 690, 18, null); B(550, 690, 760, 740, 18, null);
+    B(980, 490, 1045, 655, 22, 'MA 管理大樓', 2); B(980, 420, 1195, 465, 24, 'EE 電資館'); B(1120, 465, 1195, 680, 26, 'T2 第二教學大樓'); B(980, 685, 1195, 730, 20, 'E2 工程二館');
+    B(395, 575, 490, 690, 12, 'S 學生活動中心', 1); B(195, 570, 355, 660, 14, '體育館', 2); B(175, 625, 205, 760, 20, 'IA 醫揚大樓'); B(175, 815, 235, 975, 34, 'TR 研揚大樓', 2);
+    B(550, 370, 720, 465, 20, '第一學生宿舍', 3); B(740, 375, 820, 455, 22, '第三學生宿舍', 3); B(845, 385, 920, 460, 22, '第二學生宿舍', 3); B(430, 490, 525, 525, 18, 'T3 第三教學大樓'); B(360, 480, 420, 545, 16, null, 3);
+    { const g1 = cpx(855, 1002), g2 = cpx(905, 1002);
+      for (const g of [g1, g2]) rbox(g[0], g[1], 1.2, 1.2, 3.6, CANG, mat(0x5a5e64));
+      const gm = cpx(880, 1002); rbox(gm[0], gm[1], 7.6, .8, .9, CANG, mat(0x3a3e44), false, 3.6);
+      const s1 = sign('國立臺灣科技大學', '#2a3a5a', gm[0] - KN[0]*.45, 4.05, gm[1] - KN[1]*.45, CANG, {scale:.42});
+      const gs = cpx(925, 990); rbox(gs[0], gs[1], 2.4, 2, 2.6, CANG, mat(0xd8d4cc)); }
+    { const dn = T4DOOR, fa = Math.atan2(-KN[0], -KN[1]);
+      const dr = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.6), new THREE.MeshLambertMaterial({color:0x9fd0e8, transparent:true, opacity:.75})); dr.position.set(dn[0] + KN[0]*.72, 1.3, dn[1] + KN[1]*.72); dr.rotation.y = fa; scene.add(dr);
+      const ent = sign('入口　T4 第四教學大樓', '#1c5fb8', dn[0] + KN[0]*.7, 3.2, dn[1] + KN[1]*.7, fa, {scale:.4});
+      const can = rbox(dn[0] + KN[0]*.2, dn[1] + KN[1]*.2, 5, 2.2, .2, CANG, mat(0x8a8e94), false, 2.8); }
+    for (const [x, y] of [[790, 860], [790, 990], [970, 990], [500, 750], [470, 990], [1000, 790], [1240, 560], [1240, 760], [140, 600], [180, 990], [420, 760], [790, 520], [970, 520], [800, 740], [960, 740]]) tree(...cpx(x, y), 1.2);
+  }
+}
+// 管理學院前的鳥
+const BIRDS = [0, 1, 2].map(() => { const sh = new THREE.Mesh(new THREE.CircleGeometry(.7, 16), new THREE.MeshBasicMaterial({color:0x000000, transparent:true, opacity:0})); sh.rotation.x = -Math.PI/2; sh.visible = false; scene.add(sh);
+  const ball = new THREE.Mesh(new THREE.SphereGeometry(.18, 8, 6), mat(0xf4f4ec)); ball.visible = false; scene.add(ball); return {sh, ball, t:-1, x:0, z:0}; });
+// 雅頌廣場的畢業照
+const GRAD_T = 100;
+const photographer = person({shirt:0x3a3a3a, pants:0x2a2a2a, hair:0x1a1410});
+{ const [x, z] = along(1, GRAD_T, 6.5); photographer.position.set(x, 0, z); photographer.rotation.y = segAng(LEG[1], LEG[2]) - Math.PI/2 + Math.PI; scene.add(photographer);
+  const [tx, tz] = along(1, GRAD_T, 5.5); for (let k=0; k<3; k++) { const l = new THREE.Mesh(new THREE.CylinderGeometry(.02, .02, 1.4, 4), mat(0x222222)); l.position.set(tx + Math.cos(k*2.1)*.2, .7, tz + Math.sin(k*2.1)*.2); scene.add(l); }
+  const cam0 = new THREE.Mesh(new THREE.BoxGeometry(.3, .22, .2), mat(0x111111)); cam0.position.set(tx, 1.45, tz); scene.add(cam0); }
+const grads = [];
+for (let k=0; k<5; k++) { const g = person({shirt:0x141418, pants:0x141418, hair:0x2a1a10}); const [x, z] = along(1, GRAD_T - 2 + k, -6.5);
+  g.position.set(x, 0, z); g.rotation.y = segAng(LEG[1], LEG[2]) + Math.PI/2 + Math.PI; const cap = new THREE.Mesh(new THREE.BoxGeometry(.55, .05, .55), mat(0x111111)); cap.position.y = 1.95; g.add(cap);
+  if (k % 2) g.userData.armR.rotation.x = -2.6; scene.add(g); grads.push(g); }
+const gradBub = bubble('來～大家看這邊！', '#2a3a5a'); gradBub.scale.set(2.6, .65, 1); scene.add(gradBub);
+{ const [x, z] = along(1, GRAD_T, 6.5); gradBub.position.set(x, 2.6, z); }
+// 速速咩大軍
+const SUS = [];
+for (let r=0; r<3; r++) for (let c=0; c<4; c++) {
+  const g = new THREE.Group(), b = bike([0x2a2a2a, 0x3a6ab8, 0xb02020][r]); g.add(b);
+  const p = person({shirt:0x4a5a3a, pants:0x5a4a3a, hair:0x3a2a1a}); p.position.set(-.25, .2, 0); p.rotation.y = Math.PI/2;
+  p.userData.legL.rotation.x = -1.1; p.userData.legR.rotation.x = -.6; p.userData.armR.rotation.x = -1.6; p.userData.armL.rotation.x = -1;
+  const cape = new THREE.Mesh(new THREE.PlaneGeometry(.75, 1), new THREE.MeshLambertMaterial({color:0x2f5a3a, side:THREE.DoubleSide})); cape.position.set(0, 1.05, -.25); cape.rotation.x = .35; p.add(cape);
+  g.add(p); g.visible = false; scene.add(g); g.userData = {r, c, p}; SUS.push(g);
+}
+const susBub = bubble('速速咩──！', '#2f5a3a'); susBub.scale.set(3.4, .85, 1); susBub.visible = false; scene.add(susBub);
+// 醉月湖的鵝
+const goose = new THREE.Group();
+{ const w = mat(0xf4f4f0), o = mat(0xe8901a);
+  const b = new THREE.Mesh(new THREE.SphereGeometry(.4, 12, 8), w); b.scale.set(1, .8, 1.4); b.position.y = .5; goose.add(b);
+  const n = new THREE.Mesh(new THREE.CylinderGeometry(.07, .09, .6, 8), w); n.position.set(0, .95, .4); n.rotation.x = .3; goose.add(n);
+  const h = new THREE.Mesh(new THREE.SphereGeometry(.13, 10, 8), w); h.position.set(0, 1.25, .5); goose.add(h);
+  const bk = new THREE.Mesh(new THREE.ConeGeometry(.06, .22, 6), o); bk.rotation.x = Math.PI/2; bk.position.set(0, 1.23, .68); goose.add(bk);
+  for (const x of [-.12, .12]) { const l = new THREE.Mesh(new THREE.CylinderGeometry(.025, .025, .3, 4), o); l.position.set(x, .15, 0); goose.add(l); }
+  goose.traverse(m => { if (m.isMesh) m.castShadow = true; }); scene.add(goose); }
+const gooseBub = bubble('嘎！！', '#e8901a'); gooseBub.scale.set(1.4, .45, 1); gooseBub.position.y = 1.9; gooseBub.visible = false; goose.add(gooseBub);
+const GOOSE_HOME = along(0, 92, -26);
+// 基隆路的車
+const KCARS = [];
+for (let i=0; i<10; i++) {
+  const dir = i%2 ? 1 : -1, c = i < 6 ? makeCar([0xf2c230,0xe0e0e0,0x303030,0x2050a0,0x9a9aa0,0xf2c230][i], false) : rider([0xe8e8e8, 0x2a2a2a, 0xb02020, 0x2a5aa0][i-6]);
+  c.userData = {dir, t:rand(-140, 140), off:dir > 0 ? -(i < 6 ? 3.5 : 9.5) : (i < 6 ? 3.5 : 9.5), v:rand(10, 14), cur:0, hw:i < 6 ? 2.4 : 1.1}; KCARS.push(c);
+}
+const KWAVE = [];
+for (let i=0; i<12; i++) { const c = rider([0xe8e8e8, 0x2a2a2a, 0xb02020, 0x2a5aa0, 0xd8d0c0][i%5]); c.visible = false; c.userData = {o:-10 + (i%6)*3.8, row:Math.floor(i/6)}; KWAVE.push(c); }
+const kwBub = bubble('機車瀑布來了！', '#c0392b'); kwBub.visible = false; scene.add(kwBub);
+let kLightT = 0;
+const K_GREEN = 10, K_CYCLE = 32;
+const kGreen = () => (kLightT % K_CYCLE) < K_GREEN;
+const KSIG = {g:new THREE.MeshBasicMaterial({color:0x22ff66}), r:new THREE.MeshBasicMaterial({color:0x331111})};
+for (const s of [-1, 1]) { const [x, z] = window.__K.kp(-3.5, s*13.2);
+  const p = new THREE.Mesh(new THREE.CylinderGeometry(.1, .12, 3.2, 6), mat(0x8a8e94)); p.position.set(x, 1.6, z); scene.add(p);
+  const hd = new THREE.Mesh(new THREE.BoxGeometry(.35, .7, .35), mat(0x222222)); hd.position.set(x, 3, z); scene.add(hd);
+  for (const [m, y] of [[KSIG.r, 3.15], [KSIG.g, 2.85]]) for (const f of [-1, 1]) { const l = new THREE.Mesh(new THREE.PlaneGeometry(.22, .22), m); l.position.set(x + f*.18, y, z); l.rotation.y = f*Math.PI/2; scene.add(l); } }
+// 台科大門口的朋友
+const azhe = person({shirt:0x5a5a6a, pants:0x2a2a3a, hair:0x1a1410}), xhui = person({shirt:0xf0d0d8, pants:0x3a4a6a, hair:0x2a1810});
+{ const g = new THREE.Mesh(new THREE.BoxGeometry(.3, .1, .25), mat(0x111111)); g.position.set(0, 1.68, .22); xhui.add(g); }
+const FR = [cpx(866, 955), cpx(894, 955)], FRY = Math.atan2(-KN[0], -KN[1]);
+azhe.position.set(FR[0][0], 0, FR[0][1]); xhui.position.set(FR[1][0], 0, FR[1][1]);
+azhe.rotation.y = FRY; xhui.rotation.y = FRY; scene.add(azhe, xhui);
+const doorArrow = bubble('▼ 從這裡進去上課', '#1c5fb8'); doorArrow.scale.set(3, .75, 1); doorArrow.visible = false; scene.add(doorArrow);
+// 支線路人
+NPCS.push(
+  {name:'熱舞社學姊', at:along(1, 72, -11.5), ry:segAng(LEG[1], LEG[2]) - Math.PI/2, look:{shirt:0xd84a3a, pants:0x222222}, side:'club', text:'學弟！要不要加入熱舞社？我們這學期要去比賽喔！', opts:[
+    ['好啊', '太好了！來，先跟我們跳一段！（你被拉去跳了一整首）', () => { S.time += 15; }],
+    ['我不會跳舞', '沒關係，我們也不會啊！'],
+    ['我是台科的', '台科的也可以啊！我們不分校！']]},
+  {name:'台大學生', at:along(1, 52, 9), ry:segAng(LEG[1], LEG[2]) + Math.PI/2, look:{shirt:0x7a2a3a, pants:0x2a3a5a}, side:'which', text:'欸同學，你哪間的？', opts:[
+    ['台科大的', '喔～隔壁的。（他的語氣有一點微妙）'],
+    ['台大的', '真的？哪個系？學號幾號？……你怎麼不講話了？', () => setTimeout(() => die('冒充台大生被拆穿', '學號第一碼就講錯了'), 1600)],
+    ['你猜', '……看你的樣子，應該是隔壁的吧。']]}
+);
+NPCS.slice(-2).forEach(makeNPC);
+const SIDEQ = {goose:'從醉月湖的鵝嘴下逃生', club:'被社團招生攔下', which:'回答「你哪間的？」'};
+function achieve(k) { S.ach ||= {}; if (S.ach[k]) return; S.ach[k] = true; getCard('task', '支線完成', SIDEQ[k], `支線 ${Object.keys(S.ach).length} / 3`, 2200); }
+
+// 捷運車廂
+{
+  const n0 = scene.children.length;
+  const r = room('train', 300, 240, 22, 4.6, '捷運車廂', 0xe8ecf0, ['#c8ccd0','#bcc0c4']);
+  for (const z of [-1.85, 1.85]) for (const [a, b] of [[-10.5, -6.5], [-5, -1.6], [1.6, 5], [6.5, 10.5]]) r.box(a, b, z > 0 ? 1.7 : -2.3, z > 0 ? 2.3 : -1.7, .45, z < 0 && a === -10.5 ? 0x1c3f8a : 0x8ab0d8);
+  r.label('博愛座', '#1c3f8a', -8.5, 2.5, -2.27, 0, .5, true);
+  { const gl = new THREE.Mesh(new THREE.BoxGeometry(1.9, .08, .7), new THREE.MeshBasicMaterial({color:0x5aa0ff, transparent:true, opacity:.55})); gl.position.set(r.ox - 8.5, .5, r.oz - 2); scene.add(gl); r.seatGlow = gl;
+    const pb = bubble('（空位耶……）', '#1c3f8a'); pb.scale.set(2, .5, 1); pb.position.set(r.ox - 8.5, 1.4, r.oz - 1.9); scene.add(pb);
+    const ob = person({shirt:0x8a6a9a, pants:0x4a4a4a, hair:0xd8d8d8}); ob.position.set(r.ox - 10, 0, r.oz - .3); ob.rotation.y = Math.PI/2; ob.scale.setScalar(.92); ob.userData.armR.rotation.x = -2.9; scene.add(ob); }
+  for (const x of [-6, -1, 1, 6]) { const p = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, 3.6, 6), mat(0xd8d8d8, {metalness:.8})); p.position.set(r.ox + x, 1.8, r.oz); scene.add(p); }
+  const tun = canvasTex(512, 128, g => { const gr = g.createLinearGradient(0, 0, 0, 128); gr.addColorStop(0, '#2e3034'); gr.addColorStop(1, '#141518'); g.fillStyle = gr; g.fillRect(0,0,512,128);
+    g.fillStyle = '#0c0d0f'; for (let x=0; x<512; x+=128) g.fillRect(x, 0, 5, 128);
+    g.strokeStyle = '#08090a'; g.lineWidth = 3; for (const y of [34, 42, 50]) { g.beginPath(); for (let x=0; x<=512; x+=8) g.lineTo(x, y + Math.sin(x/128*Math.PI*2)*3); g.stroke(); }
+    g.fillStyle = '#3a3c40'; for (let x=60; x<512; x+=128) g.fillRect(x, 30, 6, 26);
+    g.fillStyle = '#fff2c0'; g.fillRect(300, 14, 26, 6); g.fillStyle = 'rgba(255,240,190,.12)'; g.fillRect(286, 6, 54, 24); });
+  tun.wrapS = THREE.RepeatWrapping; tun.repeat.set(2.5, 1); r.tunnel = tun;
+  { const enc = new THREE.Mesh(new THREE.BoxGeometry(23.5, 6, 5.6), new THREE.MeshBasicMaterial({color:0x111214, side:THREE.BackSide})); enc.position.set(r.ox, 2.5, r.oz); scene.add(enc); }
+  for (const z of [-2.29, 2.29]) { const w = new THREE.Mesh(new THREE.PlaneGeometry(20, 1), new THREE.MeshBasicMaterial({map:tun})); w.position.set(r.ox, 1.7, r.oz + z); w.rotation.y = z < 0 ? 0 : Math.PI; scene.add(w); }
+  const map = canvasTex(512, 64, g => { g.fillStyle = '#fff'; g.fillRect(0,0,512,64); g.fillStyle = '#2a8a3a'; g.fillRect(20,30,472,6); g.fillStyle = '#222'; g.font = '700 18px "Noto Sans TC", sans-serif';
+    ['市政府','國父紀念館','忠孝復興','大安','古亭','公館'].forEach((s,i) => { g.beginPath(); g.arc(30 + i*90, 33, 7, 0, 7); g.fillStyle = i === 5 ? '#c0392b' : '#2a8a3a'; g.fill(); g.fillStyle = '#222'; g.fillText(s, 10 + i*90, 22); }); });
+  const mp = new THREE.Mesh(new THREE.PlaneGeometry(4, .5), new THREE.MeshBasicMaterial({map})); mp.position.set(r.ox, 2.7, r.oz - 2.28); scene.add(mp);
+  r.riders = [];
+  for (const [x, z, sh] of [[-4, -1.6, 0x4a6a8a], [-2.5, -1.6, 0xd06a3a], [2.4, -1.6, 0x6a9a6a], [4.2, -1.6, 0xe0e0e0], [-3.4, 1.6, 0x8a3a6a], [3, 1.6, 0x3a3a3a], [8, -1.6, 0xd8a030], [-8.2, 1.6, 0x5a6c8a]]) {
+    const p = person({shirt:sh, hair:0x2a1a10}); p.position.set(r.ox + x, -.2, r.oz + z); p.rotation.y = z < 0 ? 0 : Math.PI; p.userData.legL.rotation.x = p.userData.legR.rotation.x = -1.5;
+    p.userData.armL.rotation.x = p.userData.armR.rotation.x = -.8; scene.add(p); }
+  { const ck = new THREE.Mesh(new THREE.BoxGeometry(.32, .06, .22), mat(0xd8902a)); ck.position.set(r.ox + 4.2, .78, r.oz - 1.25); scene.add(ck);
+    const bg = new THREE.Mesh(new THREE.BoxGeometry(.24, .3, .02), mat(0xf0e8d0)); bg.position.set(r.ox + 4.2, .82, r.oz - 1.15); scene.add(bg);
+    const eb = bubble('（咔滋咔滋）', '#d8902a'); eb.scale.set(1.8, .45, 1); eb.position.set(r.ox + 4.2, 2.1, r.oz - 1.6); scene.add(eb); }
+  r.spawn = [0, 1.2, -Math.PI/2];
+  scene.children.slice(n0).forEach(o => o.userData.noShadow = true);
+}
+// 教室
+const prof = person({shirt:0x6a5a4a, pants:0x3a3a3a, hair:0x9a9a9a});
+const classmates = [];
+{
+  const n0 = scene.children.length;
+  const r = room('class', 300, 320, 16, 12, '台科大 T4 第四教學大樓 T4-302', 0xe8e6e0, ['#c8c4bc','#bcb8b0']);
+  const wb = canvasTex(512, 256, g => { g.fillStyle = '#f8f8f4'; g.fillRect(0,0,512,256); g.fillStyle = '#1c3f8a'; g.font = '900 30px "Noto Sans TC", sans-serif'; g.fillText('計算機網路　第 5 週', 24, 50);
+    g.fillStyle = '#222'; g.font = '22px "Noto Sans TC", sans-serif'; ['TCP 三向交握','SYN → SYN-ACK → ACK','期中考範圍：第 1 到 6 章','（期中考會考）'].forEach((s,i) => g.fillText('・' + s, 34, 100 + i*38)); });
+  const b = new THREE.Mesh(new THREE.PlaneGeometry(6, 3), new THREE.MeshBasicMaterial({map:wb})); b.position.set(r.ox, 2, r.oz - 5.95); scene.add(b);
+  r.box(-1.2, 1.2, -5, -4.4, 1.1, 0x8a6a4a);
+  prof.position.set(r.ox + 1.8, 0, r.oz - 4.6); scene.add(prof);
+  for (const z of [-2, .6, 3.2]) for (const x of [-5, -2, 2, 5]) { r.box(x - .8, x + .8, z - .3, z + .3, .75, 0xc8a878); r.box(x - .8, x + .8, z + .45, z + .6, .45, 0x6a6a6a, false); }
+  for (const [x, z, sh] of [[-5, -1.3, 0x3a6a8a], [2, -1.3, 0xa04a3a], [5, -1.3, 0x5a5a5a], [5, 1.3, 0xd0b060], [-5, 3.9, 0x6a4a8a], [2, 3.9, 0x3a3a3a]]) {
+    const p = person({shirt:sh, hair:0x1a1410}); p.position.set(r.ox + x, -.22, r.oz + z); p.rotation.y = Math.PI; p.userData.legL.rotation.x = p.userData.legR.rotation.x = -1.5; scene.add(p); classmates.push(p); }
+  r.spawn = [0, 4.1, Math.PI];
+  scene.children.slice(n0).forEach(o => { if (o !== prof && !classmates.includes(o)) o.userData.noShadow = true; });
+}
+const chenVisitor = person({shirt:0x8a3a6a, hair:0x3a2420, pants:0x3a3a4a}); chenVisitor.visible = false; scene.add(chenVisitor);
+{ const d = new THREE.Mesh(new THREE.BoxGeometry(.1, 2.3, 1.2), mat(0x8a5a3a)); d.position.set(300 + 5.94, 1.15, -60 + 3.4); scene.add(d);
+  const s = sign('阿明的房間', '#2a5a7a', 300 + 5.88, 2.55, -60 + 3.4, -Math.PI/2, {scale:.25}); }
+
+// ---------- 任務與地點 ----------
+const TASKS = [
+  {key:'egg', label:'便利商店：茶葉蛋', door:[-46,10.5], cp:[-46,9.2, Math.PI/2], wp:[[-60,13],[-46,10]]},
+  {key:'soy', label:'超市：醬油', door:[16,10.5], cp:[16,9.2, Math.PI/2], wp:[[-22,10],[-22,37],[4,37],[4,10],[16,10]]},
+  {key:'tea', label:'飲料店：QQㄋㄟㄋㄟ好喝到咩噗茶', door:[65,-42.6], cp:[66,-41, 0], wp:[[43,10],[43,-11],[70,-14],[74,-30],[66,-42]]},
+  {key:'pot', label:'陳媽媽家：拿回鍋子', door:[-25,-43], cp:[-25,-41, 0], wp:[[74,-30],[70,-14],[43,-9.5],[-25,-9.5],[-25,-42]], hidden:true},
+  {key:'home', label:'回家交差', door:[-60,57], cp:[-60,54,Math.PI], wp:[[-25,-9.5],[-69,-9.5],[-69,10],[-60,13],[-60,56]], hidden:true},
+  {key:'mrt', label:'市政府站：搭捷運去公館', door:[30,11.2], cp:[...rw(5.5, 18.2), Math.atan2(-RD[0], -RD[1])], wp:[[-60,13],[-22,10],[-22,37],[4,37],[4,10],[30,10.5]], pm:true},
+  {key:'ntust', label:'走到台科大跟朋友會合', door:cpx(880, 960), cp:[...cpx(880, 975), Math.atan2(KN[0], KN[1])], wp:[LEG[0], LEG[1], LEG[2], LEG[3], cpx(880, 960)], pm:true},
+  {key:'class', label:'T4 第四教學大樓：上課', door:T4DOOR, wp:[cpx(880, 900), cpx(800, 852), cpx(640, 848), T4DOOR], pm:true}
+];
+const HOME_CP = [-60, 54, Math.PI];
+const ZONES = [
+  ['阿明家巷子', -63, -57, 12, 58], ['暗巷', -24, 6, 12, 41], ['住宅區小巷', -28, -22, -45, -12],
+  ['信義路口', 36, 50, -7.5, 7.5], ['信義路口', -76, -62, -7.5, 7.5], ['101 廣場', 38, 112, -96, -12],
+  ['信義路騎樓', -100, 112, 7, 12], ['信義路北側', -100, 112, -12, -7],
+  ['公館站', GX - 15, GX + 15, GZ - 15, GZ + 15], ['醉月湖', GX + 70, GX + 125, GZ - 90, GZ - 38], ['舟山路', GX + 15, GX + 108, GZ - 30, GZ + 12],
+  ['台大校園', GX + 108, GX + 180, GZ - 32, GZ + 55], ['基隆路', GX + 165, GX + 205, GZ + 55, GZ + 85]
+];
+
+// ---------- 狀態 ----------
+const S = {mode:'title', stage:0, deaths:0, causes:{}, time:0, anger:0, cp:HOME_CP, nextCall:rand(25, 40), ring:0, frozen:0, zone:'', locked:false};
+const P = {vy:0, y:0, run:false, spd:0, vx:0, vz:0};
+let yaw = Math.PI, pitch = .32;
+const keys = {};
+const T = {};   // 陷阱狀態
+
+function resetTraps() {
+  T.domino = {on:false, t:0, armed:S.stage === 0};
+  scooters.forEach(s => { s.rotation.set(0,0,0); s.position.x = -57.8; });
+  T.zombie = {st:'idle', t:0};
+  zombie.position.set(-8, 0, 38.5); zombie.rotation.y = 0;
+  T.cust = {st:'idle', t:0};
+  customer.visible = false; cup.visible = false; cbub.visible = false; customer.userData.armR.rotation.x = 0;
+  T.drunk = {on:false, t:0, fired:[false,false]}; T.wasRoad = onRoad();
+  drunkCar.visible = false;
+  T.trip = 0; T.momCome = 0; momP.visible = false;
+  T.argued = false;
+  T.sus = {st:'idle', t:0}; SUS.forEach(g => g.visible = false); susBub.visible = false;
+  T.goose = {st:'idle', t:0}; goose.position.set(GOOSE_HOME[0], 0, GOOSE_HOME[1]); gooseBub.visible = false;
+  T.kw = {st:'idle', t:0}; KWAVE.forEach(c => c.visible = false); kwBub.visible = false; T.kRoad = false;
+  if (typeof chenVisitor !== 'undefined') chenVisitor.visible = S.stage >= 8;
+}
+
+// ---------- 音效 ----------
+let AC = null, master = null, musicBus = null, musicOn = true, musicNode = null, voiceOn = true;
+function audio() {
+  if (!AC) { AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = .7*.7; master.connect(AC.destination);
+    musicBus = AC.createGain(); musicBus.gain.value = .5; musicBus.connect(AC.destination); }
+  if (AC.state === 'suspended') AC.resume();
+  return AC;
+}
+function tone(f, d, type='square', v=.15, when=0, slide=0, dest) {
+  if (!AC) return;
+  const t = AC.currentTime + when, o = AC.createOscillator(), g = AC.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(slide, t+d);
+  g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t+d);
+  o.connect(g); g.connect(dest || master); o.start(t); o.stop(t+d+.02);
+}
+const sfx = {
+  buy: () => [660, 880, 1320].forEach((f,i) => tone(f, .15, 'triangle', .18, i*.09)),
+  die: () => { tone(400, .6, 'sawtooth', .2, 0, 60); tone(200, .8, 'square', .12, .1, 40); },
+  ring: () => [0, .18].forEach(w => tone(1250, .12, 'sine', .15, w)),
+  honk: () => { tone(380, .45, 'sawtooth', .18); tone(470, .45, 'sawtooth', .14); },
+  hit: () => tone(140, .25, 'square', .2, 0, 50),
+  ok: () => tone(990, .1, 'triangle', .15),
+  bad: () => tone(180, .25, 'sawtooth', .15)
+};
+const VOICE = {'客人':[250,1],'媽媽':[290,1],'媽媽（電話）':[290,1],'阿明':[210,1],'店員':[430,1.1],'陳媽媽':[350,.85],'試吃阿姨':[380,1]};
+function blip(name, ch) {
+  if (!AC || !ch || !voiceOn) return;
+  const v = VOICE[name] || (name ? [330,1] : null); if (!v) return;
+  if (/[\s，。、！？…「」『』（）～—：；,.!?()~\-]/.test(ch)) return;
+  const c = ch.codePointAt(0), f = v[0] * (1 + ((c*7) % 9)/14), t = AC.currentTime;
+  const o = AC.createOscillator(), g = AC.createGain(), bp = AC.createBiquadFilter();
+  o.type = 'sawtooth'; o.frequency.setValueAtTime(f*1.12, t); o.frequency.exponentialRampToValueAtTime(f*.9, t + .07);
+  bp.type = 'bandpass'; bp.frequency.value = 900 + (c % 5)*350; bp.Q.value = 2.5;
+  g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.22, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + .075);
+  o.connect(bp); bp.connect(g); g.connect(master); o.start(t); o.stop(t + .09);
+}
+function speak(name, text) { [...text].slice(0, 40).forEach((ch, i) => setTimeout(() => blip(name, ch), i*55)); }
+function startMusic() {
+  clearInterval(musicNode);
+  const bass = [130.8, 196, 220, 174.6];
+  const lead = [523, 0, 587, 659, 0, 784, 659, 0, 587, 0, 523, 440, 0, 392, 440, 0, 523, 0, 587, 659, 0, 880, 784, 0, 659, 0, 587, 523, 0, 587, 523, 0];
+  let i = 0, next = AC.currentTime + .05;
+  musicNode = setInterval(() => {
+    while (next < AC.currentTime + .3) {
+      const w = next - AC.currentTime;
+      if (i % 2 === 0) tone(bass[(i>>3) % 4] * (i % 4 ? 1.5 : 1), .16, 'triangle', .16, w, 0, musicBus);
+      if (lead[i % 32]) tone(lead[i % 32], .14, 'square', .045, w, 0, musicBus);
+      if (i % 4 === 0) tone(110, .1, 'sine', .25, w, 45, musicBus);
+      if (i % 2 === 1) tone(5000, .02, 'square', .012, w, 0, musicBus);
+      i++; next += .17;
+    }
+  }, 80);
+}
+function setMusic(on) {
+  audio(); musicOn = on; $('music').textContent = on ? '開' : '關';
+  if (on) startMusic(); else clearInterval(musicNode);
+}
+const toggleMusic = () => setMusic(!musicOn);
+$('music').onclick = toggleMusic;
+$('voice').onclick = () => { voiceOn = !voiceOn; $('voice').textContent = voiceOn ? '開' : '關'; };
+let hiQ = true;
+function setQual(h) { hiQ = h; $('qual').textContent = h ? '高' : '低'; sun.castShadow = h; renderer.setPixelRatio(h ? Math.min(devicePixelRatio, 1.5) : 1); renderer.setSize(innerWidth, innerHeight); }
+$('qual').onclick = () => { setQual(!hiQ); saveSet(); };
+$('mvol').oninput = e => { audio(); musicBus.gain.value = e.target.value/100; };
+$('svol').oninput = e => { audio(); master.gain.value = .7 * e.target.value/100; tone(880, .08, 'triangle', .15); };
+$('resume').onclick = () => { userPaused = false; lock(); };
+try { const st = JSON.parse(localStorage.getItem('amin_set') || '{}'); if (st.m === false) musicOn = false; if (st.v === false) voiceOn = false; if (st.mv != null) $('mvol').value = st.mv; if (st.sv != null) $('svol').value = st.sv; } catch(e) {}
+$('music').textContent = musicOn ? '開' : '關'; $('voice').textContent = voiceOn ? '開' : '關';
+const saveSet = () => { try { localStorage.setItem('amin_set', JSON.stringify({m:musicOn, v:voiceOn, mv:+$('mvol').value, sv:+$('svol').value, q:hiQ})); } catch(e) {} };
+try { if (JSON.parse(localStorage.getItem('amin_set') || '{}').q === false) setQual(false); } catch(e) {}
+['music','voice'].forEach(k => $(k).addEventListener('click', saveSet)); ['mvol','svol'].forEach(k => $(k).addEventListener('change', saveSet));
+
+// ---------- 介面 ----------
+function renderList() {
+  const pm = S.stage >= 5;
+  $('list').querySelector('h3').textContent = pm ? '下午行程' : '媽媽的購物清單';
+  $('items').innerHTML = TASKS.map((t,i) => {
+    if (!!t.pm !== pm) return '';
+    if (t.hidden && i > S.stage) return '';
+    const cls = i < S.stage ? 'done' : i === S.stage ? 'cur' : '';
+    return `<div class="it ${cls}">${i < S.stage ? '☑' : '☐'} ${t.label}</div>`;
+  }).join('');
+}
+function renderStats() {
+  const m = Math.floor(S.time/60), s = Math.floor(S.time%60);
+  $('time').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  $('deaths').textContent = S.deaths; $('rc').textContent = `${S.rc||0} / ${receipts.length}`;
+  [...$('anger').children].forEach((e,i) => e.classList.toggle('on', i < S.anger));
+}
+let bannerT = 0;
+function banner(t) { $('banner').textContent = t; $('banner').classList.add('show'); bannerT = 2.2; }
+function prompt(t) { if (t) { $('prompt').textContent = t; $('prompt').classList.remove('hide'); } else $('prompt').classList.add('hide'); }
+
+let dlg = null;
+function dialog(lines, done) {
+  dlg = {lines, i:0, done}; S.prevMode = S.mode === 'dialog' ? S.prevMode : S.mode; S.mode = 'dialog';
+  showLine();
+}
+let typeT = null;
+function showLine() {
+  const [n, t] = dlg.lines[dlg.i];
+  $('dname').textContent = n; $('dname').style.display = n ? '' : 'none'; $('dtext').textContent = '';
+  $('dialog').classList.remove('hide');
+  const cs = [...t]; let k = 0; dlg.typing = true; clearInterval(typeT);
+  typeT = setInterval(() => {
+    if (!dlg) { clearInterval(typeT); return; }
+    k++; $('dtext').textContent = cs.slice(0, k).join(''); blip(n, cs[k-1]);
+    if (k >= cs.length) { clearInterval(typeT); dlg.typing = false; }
+  }, 45);
+}
+function nextLine() {
+  if (!dlg) return;
+  if (dlg.typing) { clearInterval(typeT); dlg.typing = false; $('dtext').textContent = dlg.lines[dlg.i][1]; return; }
+  dlg.i++;
+  if (dlg.i >= dlg.lines.length) { $('dialog').classList.add('hide'); const d = dlg.done; dlg = null; S.mode = 'play'; d && d(); }
+  else showLine();
+}
+function overlay(id) {
+  ['death','order','chen','argue','end','pause','store','shelf','choice'].forEach(k => $(k).classList.toggle('hide', k !== id));
+  $('overlay').classList.toggle('hide', !id);
+}
+let userPaused = false, selfUnlock = false, lockLost = 0;
+const lock = () => { if (TEST) return; try { const r = renderer.domElement.requestPointerLock?.(); r && r.catch && r.catch(() => {}); } catch(e) {} };
+const unlock = () => { if (document.pointerLockElement) { selfUnlock = true; document.exitPointerLock(); } };
+document.addEventListener('pointerlockchange', () => {
+  S.locked = document.pointerLockElement === renderer.domElement;
+  if (S.locked) userPaused = false;
+  else if (selfUnlock) selfUnlock = false;
+  else if (S.mode === 'play') { userPaused = true; lockLost = performance.now(); }
+});
+
+// ---------- 死亡 ----------
+const MOM = {
+  '被機車骨牌壓扁':'出門不用一分鐘就死，你很厲害。',
+  '被騎樓絆倒':'走路不會看路喔？地磚壞掉那麼明顯。',
+  '被喪屍煙彈客撲倒':'叫你不要走暗巷。',
+  '坐博愛座被拍上爆料公社':'我養你這麼大，你就坐博愛座？',
+  '被速速咩大軍輾過':'台大的路你也敢走中間？',
+  '被醉月湖的鵝追咬':'叫你不要去惹那隻鵝。',
+  '冒充台大生被拆穿':'你就承認你是台科的會怎樣？',
+  '基隆路闖紅燈':'基隆路那麼大條你也敢闖？',
+  '被機車瀑布淹沒':'綠燈也要等機車過完，這是台北的常識。',
+  '點名沒到':'學費繳了你不去上課？',
+  '幫自己代答被抓包':'你是覺得教授很好騙嗎？',
+  '答錯被教授記住名字':'期中考你自己看著辦。',
+  '上課睡著被教授點名':'晚上不睡覺，上課在睡覺。',
+  '捷運急煞跌倒':'搭捷運要握扶手，小學生都知道。',
+  '在捷運上吃東西被罰':'1500 元你自己出。',
+  '被鳥屎命中':'回來先去洗澡，不要碰任何東西。',
+  '闖進別人的畢業照':'人家一輩子一次的畢業照耶！',
+  '被闖紅燈的車撞飛':'綠燈也要看左右，台灣的路就是這樣。',
+  '被酒駕撞飛':'過馬路要看左右，酒駕的更要看。',
+  '闖紅燈被撞':'紅燈不能過馬路，幼稚園就教過了。',
+  '被捲入口水戰':'叫你不要管閒事。',
+  '被半杯拿鐵砸中':'外面咖啡那麼貴，在家喝即溶就好。',
+  '社會性死亡':'連飲料都不會點。',
+  '被陳媽媽的兒子比下去':'你看人家志豪。',
+  '媽媽親自出門找你':'我自己出來買比較快。',
+  '沒洗手就碰媽媽':'回家第一件事是什麼？洗手！',
+  '沒跟長輩打招呼':'見到長輩要叫人，我是怎麼教你的？',
+  '在便利商店滑倒':'地上寫小心地滑，你看不懂中文喔？',
+  '被購物推車撞飛':'超市也能出事，你真的很厲害。'
+};
+function die(cause, extra) {
+  if (S.mode === 'dead' || S.mode === 'end') return;
+  S.mode = 'dead'; S.deaths++; S.causes[cause] = (S.causes[cause]||0) + 1;
+  sfx.die();
+  $('dcause').textContent = cause;
+  $('dmom').textContent = '媽媽：「' + MOM[cause] + '」';
+  $('dcnt').textContent = (extra ? extra + '　' : '') + `累計死亡 ${S.deaths} 次`;
+  $('dhint').style.visibility = 'hidden';
+  S.deadAt = performance.now();
+  setTimeout(() => $('dhint').style.visibility = 'visible', 700);
+  $('dialog').classList.add('hide'); dlg = null; clearInterval(typeT);
+  stopMic();
+  clearInterval(orderTimer); clearInterval(chenTimer); clearInterval(storeTimer); clearInterval(chTimer); $('chbarw').classList.add('hide'); $('sleepui').classList.add('hide');
+  $('phone').classList.add('hide'); $('sub').classList.add('hide'); S.ring = 0; S.frozen = 0;
+  overlay('death'); renderStats();
+}
+function respawn() {
+  overlay(null);
+  const [x, z, a] = S.stage === 0 ? HOME_CP : S.cp;
+  player.position.set(x, 0, z); P.y = 0; P.vy = 0; yaw = a + Math.PI; player.rotation.y = a;
+  S.anger = 0; S.nextCall = rand(25, 40); S.wp = 0; S.room = null; S.hasEgg = S.hasSoy = false; pitch = .32; $('fade').style.opacity = ''; $('sleepui').classList.add('hide'); clearInterval(chTimer);
+  resetTraps();
+  S.mode = 'play'; lock(); renderStats();
+}
+
+// ---------- 輸入 ----------
+addEventListener('keydown', e => {
+  keys[e.code] = true;
+  if (e.code === 'Space') e.preventDefault();
+  if (e.code === 'Escape' && S.mode === 'play' && !S.locked && performance.now() - lockLost > 400) { userPaused = !userPaused; return; }
+  if (e.code === 'KeyM' && S.mode !== 'title') { toggleMusic(); saveSet(); }
+  if (S.mode === 'dead' && performance.now() - S.deadAt > 700) { respawn(); return; }
+  if (S.mode === 'dialog' && (e.code === 'Space' || e.code === 'KeyE' || e.code === 'Enter')) { nextLine(); return; }
+  if (S.mode === 'sleep' && e.code === 'Space') { S.drowse = Math.max(0, S.drowse - .07); tone(600 + rand(0, 300), .04, 'square', .05); return; }
+  if (S.mode === 'play') {
+    if (e.code === 'Space' && P.y <= (onStep(player.position.x, player.position.z) ? STEP.h : 0) + .01 && S.frozen <= 0) P.vy = 5.6;
+    if (e.code === 'KeyE') interact();
+    if (e.code === 'KeyF' && S.ring > 0) answer();
+  }
+});
+addEventListener('keyup', e => keys[e.code] = false);
+addEventListener('mousemove', e => {
+  if (!S.locked || (S.mode !== 'play' && S.mode !== 'dialog')) return;
+  yaw -= e.movementX * .0025; pitch = clamp(pitch + e.movementY * .002, -.15, S.room ? .55 : 1.1);
+});
+renderer.domElement.addEventListener('click', () => {
+  if (S.mode === 'dialog') nextLine();
+  if (S.mode === 'dead' && performance.now() - S.deadAt > 700) { respawn(); return; }
+  if ((S.mode === 'play' || S.mode === 'dialog') && !S.locked) lock();
+});
+$('overlay').addEventListener('click', e => {
+  if (S.mode === 'dead' && performance.now() - S.deadAt > 700) respawn();
+  else if (S.mode === 'play' && userPaused && e.target.id === 'overlay') { userPaused = false; lock(); }
+});
+
+// ---------- 電話 ----------
+const NAG_AM = ['醬油不要買錯，買錯你自己喝掉。','茶葉蛋要挑顏色深一點的，比較入味。','飲料不要給我全糖喔，我在控制血糖。','你是不是又在路上滑手機？','走路看路，不要給我出事。','經過陳媽媽家記得打招呼。','買完就回來，不要在外面亂晃。','發票記得拿，月底要對獎。','隔壁陳媽媽的兒子已經在醫院實習了。','你表哥說他年終拿六個月。','超商的袋子要錢，不要拿。','你到底到哪裡了？我在陽台看不到你。'];
+const NAG_PM = ['上課有沒有在聽？不要給我睡覺。','教授點名你有沒有到？','晚餐要不要回來吃？我煮了你愛吃的滷肉。','雨傘有沒有帶？氣象說傍晚會下雨。','你那個資工到底在學什麼，可以修冷氣嗎？','捷運上不要坐博愛座喔，會被拍。','下課直接回家，不要跟阿哲去網咖。','你的期中考什麼時候？','剛剛陳媽媽說志豪又拿書卷獎了。','你去台科大會經過台大嘛，要不要考轉學？','早上那個醬油很好用，你終於買對一次。','晚上陳媽媽要來家裡坐，你早點回來。'];
+function answer() {
+  S.ring = 0; $('phone').classList.add('hide');
+  const pool = S.stage >= 5 ? NAG_PM : NAG_AM, ng = pool[(Math.random()*pool.length)|0]; S.frozen = 3; $('sub').textContent = '媽媽：「' + ng + '」'; $('sub').classList.remove('hide'); speak('媽媽', ng);
+  S.nextCall = rand(25, 40);
+}
+
+// ---------- 互動 ----------
+function nearDoor() {
+  const t = TASKS[S.stage]; if (!t) return null;
+  const d = Math.hypot(player.position.x - t.door[0], player.position.z - t.door[1]);
+  return d < 2.8 ? t : null;
+}
+function complete(next) {
+  sfx.buy(); S.stage++; S.cp = TASKS[S.stage-1].cp || S.cp; S.wp = 0; renderList(); next && next();
+}
+const ICON = {
+  egg:'<svg viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="30" ry="38" fill="#8a5a2a"/><path d="M28 40 L40 48 L36 60 L50 66 L46 78 M60 30 L66 44 L58 52 L72 60" stroke="#3a2210" stroke-width="3" fill="none"/></svg>',
+  soy:'<svg viewBox="0 0 100 100"><rect x="42" y="6" width="16" height="12" fill="#c0392b"/><path d="M40 18h20l8 16v58q0 6-6 6H38q-6 0-6-6V34z" fill="#3a1a0a"/><rect x="34" y="50" width="32" height="26" fill="#f4ecd8"/><text x="50" y="68" font-size="12" text-anchor="middle" font-weight="900" fill="#222">醬油</text></svg>',
+  tea:'<svg viewBox="0 0 100 100"><path d="M28 24h44l-6 70H34z" fill="#e8d6b8" stroke="#fff" stroke-width="2"/><rect x="24" y="18" width="52" height="8" rx="3" fill="#c0392b"/><rect x="56" y="2" width="5" height="22" fill="#222" transform="rotate(12 58 12)"/><g fill="#2a1a10">'+[...Array(14)].map((_,i)=>`<circle cx="${38+(i%5)*6}" cy="${84-Math.floor(i/5)*6}" r="3"/>`).join('')+'</g></svg>',
+  pot:'<svg viewBox="0 0 100 100"><rect x="14" y="42" width="72" height="40" rx="8" fill="#9aa0a8"/><rect x="10" y="36" width="80" height="10" rx="4" fill="#b8bec6"/><rect x="42" y="26" width="16" height="10" rx="3" fill="#333"/><rect x="2" y="50" width="12" height="6" fill="#333"/><rect x="86" y="50" width="12" height="6" fill="#333"/></svg>',
+  task:'<svg viewBox="0 0 100 100"><rect x="30" y="8" width="40" height="84" rx="8" fill="#222"/><rect x="34" y="16" width="32" height="62" fill="#06a54b"/><text x="50" y="52" font-size="22" text-anchor="middle" fill="#fff" font-weight="900">！</text></svg>'
+};
+let cardT = null;
+function getCard(icon, kind, title, sub, ms=2400) {
+  $('gicon').innerHTML = ICON[icon]; $('gkind').textContent = kind; $('gtitle').textContent = title; $('gsub').textContent = sub || '';
+  $('getcard').classList.add('show'); clearTimeout(cardT); cardT = setTimeout(() => $('getcard').classList.remove('show'), ms);
+}
+let lineT = null;
+function lineMsg(t, delay=0, who='媽媽') {
+  setTimeout(() => { $('lwho').textContent = 'LINE．' + who; $('ltext').textContent = t; $('line').classList.add('show'); tone(880, .08, 'sine', .12); tone(1320, .1, 'sine', .12, .09);
+    clearTimeout(lineT); lineT = setTimeout(() => $('line').classList.remove('show'), 4500); }, delay);
+}
+function wrongItem(name, msg) {
+  S.anger++; renderStats(); sfx.bad(); lineMsg(msg);
+  if (S.anger >= 3) die('媽媽親自出門找你', `又拿了${name}`);
+}
+function roomActs() {
+  const R = S.room, r = ROOMS[R];
+  if (R === 'cvs') return [
+    {x:3, z:-2, r:1.1, label:'夾一顆茶葉蛋', act:() => { if (S.hasEgg) return; S.hasEgg = true; sfx.ok(); getCard('egg', '拿到了', '茶葉蛋', '還沒結帳，拿去櫃台', 1800); }},
+    {x:5.1, z:-2, r:1.1, label:'結帳', act:() => S.stage > 0 ? dialog([['店員','謝謝光臨～']]) : S.hasEgg ? dialog([['店員','歡迎光臨～'],['店員','一顆茶葉蛋，13 元。我問你幾個問題喔。']], startStore) : dialog([['店員','歡迎光臨～要買什麼自己拿喔。']])},
+    {x:-4.8, z:-4.4, r:1.1, label:'拿溫泉蛋', act:() => wrongItem('溫泉蛋', '我說茶葉蛋！溫泉蛋買回來要幹嘛？')},
+    {x:-2.4, z:-4.4, r:1.1, label:'拿糖心蛋', act:() => wrongItem('糖心蛋', '糖心蛋那麼貴！我說茶葉蛋！')},
+    {x:0, z:5.4, r:1.1, label:'離開便利商店', act:exitRoom}];
+  if (R === 'mkt') return [
+    {x:-5, z:-2, r:1.6, label:'找醬油（打給媽媽問）', act:() => S.hasSoy ? null : dialog([['阿明','醬油……一整排都長得差不多。'],['阿明','打給媽媽問好了。']], startShelf)},
+    {x:4.2, z:4, r:1.3, label:'結帳', act:() => S.stage > 1 ? dialog([['店員','謝謝光臨。']]) : S.hasSoy ? dialog([['店員','一共 89 元，要袋子嗎？'],['阿明','不用。'],['店員','有會員嗎？手機號碼？'],['阿明','……沒有。'],['店員','好的，發票給你。']], () => {
+      complete(); S.rc = (S.rc||0) + 1; renderStats(); getCard('soy', '獲得', '醬油', '還多拿到一張發票'); lineMsg('對，就是那罐。你終於做對一件事。', 1800); }) : dialog([['店員','你還沒拿東西喔。']])},
+    {x:0, z:7.4, r:1.1, label:'離開超市', act:exitRoom}];
+  if (R === 'chen') return [
+    {x:1.8, z:-.2, r:1.8, label:'跟陳媽媽說話', act:() => S.stage === 3 ? choice('陳媽媽', '哎呀，是阿明啊！', shuffle([
+      ['阿姨好！', () => { overlay(null); S.mode = 'play'; dialog([['陳媽媽','乖～來來來，坐坐坐。'],['陳媽媽','你媽的鍋子在廚房，我等一下拿給你。'],['陳媽媽','先坐一下嘛，你媽說你讀資工喔？']], sitChen); }],
+      ['我媽的鍋子呢？', () => die('沒跟長輩打招呼', '陳媽媽：「現在的年輕人喔，連叫人都不會。」')],
+      ['（點個頭）', () => die('沒跟長輩打招呼', '陳媽媽：「點頭是什麼意思？不會叫阿姨喔？」')]])) : dialog([['陳媽媽','鍋子拿好喔，幫我跟你媽問好。']])},
+    {x:0, z:4.5, r:.9, label:'離開陳媽媽家', act:exitRoom}];
+  if (R === 'train') return [
+    {x:-8.5, z:-1.4, r:1.1, label:'坐博愛座', act:() => die('坐博愛座被拍上爆料公社', '標題：「年輕人好手好腳還坐博愛座」')},
+    {x:2.4, z:-1.2, r:.9, label:'找位子坐', act:() => dialog([['阿明','……這裡有人了。'],['乘客','（瞪）']])},
+    {x:4.2, z:-.9, r:1, label:'看吃雞排的乘客', act:() => choice('吃雞排的乘客', '（咔滋咔滋）……看什麼？', [
+      ['捷運上不能吃東西喔', () => choice('吃雞排的乘客', '……喔。（他默默把雞排收進袋子，瞪了你一眼）', [['（離開）', () => endChoice()]])],
+      ['（假裝沒看到）', () => endChoice()],
+      ['可以分我一口嗎？', () => choice('吃雞排的乘客', '好啊，拿去。', [['（咬一口）', () => die('在捷運上吃東西被罰', '剛好有站務人員經過，罰鍰 1500 元')]])]])},
+    {x:0, z:1.6, r:1.3, label:S.arrived ? '下車' : '還沒到站', act:() => S.arrived ? leaveTrain() : dialog([['','列車還在行駛中。']])}];
+  if (R === 'class') return [
+    {x:-2, z:1.6, r:1.1, label:'坐到朋友中間', act:() => S.stage === 7 ? startClass() : null},
+    {x:0, z:5.5, r:.9, label:'離開教室', act:() => S.stage === 7 ? dialog([['小慧','要上課了啦，你要去哪？']]) : exitRoom()}];
+  if (R === 'home' && S.stage >= 8) return [
+    {x:1.6, z:.2, r:1.8, label:'跟媽媽說話', act:momEvening},
+    {x:0, z:4.5, r:.9, label:'出門', act:() => dialog([['媽媽','都晚上了，還要去哪？']])},
+    {x:-5.0, z:2.8, r:.9, label:'用洗手台', act:() => { S.washed = true; for (let i=0; i<8; i++) tone(rand(1800, 3200), .05, 'sine', .05, i*.06); }},
+    {x:-4.7, z:4.3, r:.8, label:'上廁所', act:() => dialog([['阿明','……現在好像不是上廁所的時候。']])},
+    {x:-1, z:-3.2, r:1.4, label:'跟陳媽媽說話', act:() => dialog([['陳媽媽','阿明回來啦！跟你說喔，我們家志豪今天又……'],['阿明','（假裝沒聽到）']])},
+    {x:5.1, z:3.4, r:1.2, label:'回房間', act:() => S.momTalked ? finale() : dialog([['媽媽','回來都不用叫人喔？']])}];
+  if (R === 'home') return [
+    {x:1.6, z:.2, r:1.8, label:S.stage === 4 ? '把東西交給媽媽' : '跟媽媽說話', act:() => S.stage === 4 ? (S.washed ? dialog([['媽媽','怎麼這麼久？'],['媽媽','茶葉蛋、醬油、飲料……鍋子也拿回來了。'],['媽媽','手有洗喔，很好。'],['媽媽','欸，你下午不是有課？還不快去！'],['阿明','啊！對耶！']], afternoon) : die('沒洗手就碰媽媽', '媽媽：「你剛從外面回來，手摸過什麼你知道嗎？」')) : dialog([['媽媽','還站在這裡幹嘛？快去！']])},
+    {x:-5.0, z:2.8, r:.9, label:'用洗手台', act:() => { if (S.washed) return; S.washed = true; for (let i=0; i<8; i++) tone(rand(1800, 3200), .05, 'sine', .05, i*.06); getCard('task', '洗好了', '手很乾淨', '', 1400); }},
+    {x:-4.7, z:4.3, r:.8, label:'上廁所', act:() => dialog([['阿明','……現在好像不是上廁所的時候。']])},
+    {x:0, z:4.5, r:.9, label:'出門', act:exitRoom}];
+  return [];
+}
+function nearAct() {
+  if (!S.room) return null;
+  const r = ROOMS[S.room], p = player.position;
+  let best = null, bd = 1e9;
+  for (const a of roomActs()) { const d = Math.hypot(p.x - r.ox - a.x, p.z - r.oz - a.z); if (d < a.r && d < bd) { bd = d; best = a; } }
+  return best;
+}
+function enterRoom(k) {
+  const r = ROOMS[k]; S.room = k; S.hasEgg = false; S.hasSoy = false; S.washed = false;
+  player.position.set(r.ox + r.spawn[0], 0, r.oz + r.spawn[1]); player.rotation.y = r.spawn[2]; yaw = r.spawn[2] + Math.PI; pitch = .25;
+  T.cart = {st:'idle', t:0}; T.aunt = false; r.cart && r.cart.position.set(r.ox - 5, 0, r.oz - 7);
+  banner(r.name); tone(660, .12, 'sine', .12); tone(880, .2, 'sine', .12, .12);
+}
+function sitChen() {
+  const r = ROOMS.chen;
+  player.position.set(r.ox, -.22, r.oz - 3.95); player.rotation.y = 0; yaw = Math.PI; pitch = .35;
+  player.userData.legL.rotation.x = player.userData.legR.rotation.x = -1.5;
+  chenMom.position.set(r.ox + 1.6, 0, r.oz - 1.1); chenMom.lookAt(player.position.x, 0, player.position.z);
+  startChen();
+}
+function exitRoom() {
+  const cp = {cvs:TASKS[0].cp, mkt:TASKS[1].cp, chen:TASKS[3].cp, home:HOME_CP, class:[T4DOOR[0] - KN[0]*2, T4DOOR[1] - KN[1]*2, Math.atan2(-KN[0], -KN[1])]}[S.room];
+  S.room = null; const [x, z, a] = cp;
+  player.position.set(x, 0, z); player.rotation.y = a; yaw = a + Math.PI; pitch = .32;
+}
+function interact() {
+  if (S.room) { const a = nearAct(); a && a.act(); return; }
+  const t = nearDoor(); if (!t) { const n = nearNPC(); n && talkNPC(n); return; }
+  if (t.key === 'egg') enterRoom('cvs');
+  else if (t.key === 'soy') enterRoom('mkt');
+  else if (t.key === 'tea') startOrder();
+  else if (t.key === 'pot') { enterRoom('chen'); speak('陳媽媽', '來了來了'); }
+  else if (t.key === 'home') enterRoom('home');
+  else if (t.key === 'mrt') enterTrain();
+  else if (t.key === 'ntust') meetFriends();
+  else if (t.key === 'class') enterRoom('class');
+}
+const shuffle = a => [...a].sort(() => Math.random() - .5);
+function choice(name, text, opts) {
+  S.mode = 'choice'; unlock(); overlay('choice');
+  $('chname').textContent = name; $('chtext').textContent = '「' + text + '」'; speak(name, text);
+  $('chopts').innerHTML = '';
+  opts.forEach(([t, fn]) => { const b = document.createElement('button'); b.className = 'opt'; b.textContent = t; b.onclick = () => { if (S.mode === 'choice') fn(); }; $('chopts').appendChild(b); });
+}
+function endChoice(after) { overlay(null); S.mode = 'play'; lock(); after && after(); }
+function auntTalk() {
+  const bye = (t, f) => choice('試吃阿姨', t, [['（離開）', () => endChoice(f)]]);
+  choice('試吃阿姨', '帥哥～這個香腸吃吃看！今天買一送一喔！', [
+    ['好吃耶', () => choice('試吃阿姨', '對吧！那買兩包啦，冰箱放得下！', [
+      ['……好啦', () => bye('謝謝帥哥～下次再來喔！', () => { S.anger++; renderStats(); lineMsg('你買香腸幹嘛？叫你買醬油！'); if (S.anger >= 3) die('媽媽親自出門找你', '亂買香腸'); })],
+      ['下次再買', () => bye('下次就沒有買一送一囉～')]])],
+    ['不用了謝謝', () => { S.time += 5; bye('吃一口又不用錢！（你的嘴裡被塞了一塊香腸）'); }],
+    ['我趕時間', () => choice('試吃阿姨', '趕時間更要吃飽啊！來，這個水餃也吃吃看！', [
+      ['真的很趕！', () => bye('好啦好啦，加油喔帥哥～')],
+      ['……那我吃一個', () => { S.time += 10; bye('對嘛！再來一個！（又過了十秒）'); }]])]
+  ]);
+}
+
+// ---------- 便利商店：店員連環問 ----------
+const STORE_Q = [
+  ['要袋子嗎？一個 2 元喔。', [['要','好，加 2 元。','anger:一顆蛋你要袋子？錢很好賺喔？'],['不用','好的。']]],
+  ['有載具嗎？', [['有','（嗶）好了。'],['沒有','好，紙本發票給你。','rc'],['什麼是載具？','……我解釋一下喔。','fail:店員開始解釋什麼是載具……五分鐘過去了。']]],
+  ['要集點嗎？集滿 30 點可以換公仔喔。', [['要','好，貼紙給你。','time:你翻了半天找集點卡。'],['不用','好的。']]],
+  ['要不要加購關東煮？今天第二件半價喔。', [['好','好，幫你夾。','anger:叫你買蛋，你買關東煮幹嘛？'],['不用','好的。']]],
+  ['發票要捐嗎？', [['捐','謝謝你的愛心。'],['不捐','好，發票給你。','rc']]],
+  ['要不要順便繳停車費？', [['要','停車單給我。','time:你根本沒有停車單，店員白等了。'],['不用','好的。']]],
+  ['會員電話幾號？', [['唸電話','09……好，有了。'],['我不是會員','要不要現在加入？很划算喔。','time:店員開始介紹會員方案。']]]
+];
+let store = null, storeTimer = null;
+function startStore() { S.mode = 'store'; unlock(); overlay('store'); store = {qs:shuffle(STORE_Q).slice(0,4), i:0}; storeQ(); }
+function storeQ() {
+  if (store.i >= store.qs.length) { storeEnd(); return; }
+  const [q, opts] = store.qs[store.i];
+  $('sq').textContent = `第 ${store.i+1} / ${store.qs.length} 題．每題 2.5 秒`; $('sline').textContent = '店員：「' + q + '」'; $('sreact').textContent = ''; speak('店員', q);
+  $('sopts').innerHTML = '';
+  opts.forEach(o => { const b = document.createElement('button'); b.className = 'opt'; b.textContent = o[0]; b.onclick = () => storePick(o); $('sopts').appendChild(b); });
+  let left = 2.5; $('stime').style.width = '100%'; clearInterval(storeTimer);
+  storeTimer = setInterval(() => { left -= .1; $('stime').style.width = Math.max(0, left/2.5*100) + '%'; if (left <= 0) storeFail('店員：「……下一位。」後面排隊的大叔嘆了一口氣。'); }, 100);
+}
+function storePick(o) {
+  if (!store || S.mode !== 'store' || store.busy) return;
+  clearInterval(storeTimer); store.busy = true; $('sopts').innerHTML = '';
+  const [ans, react, fx] = o, [kind, msg] = (fx || '').split(':');
+  if (kind === 'fail') { store.busy = false; storeFail(msg); return; }
+  let note = '店員：「' + react + '」';
+  speak('店員', react);
+  if (kind === 'rc') { S.rc = (S.rc||0) + 1; renderStats(); tone(1400, .08, 'square', .1); note += '（發票 +1）'; }
+  if (kind === 'time') { S.time += 8; note += '　' + msg + '（時間 +8 秒）'; }
+  if (kind === 'anger') { S.anger++; renderStats(); lineMsg(msg); sfx.bad(); note += '（媽媽怒氣 +1）';
+    if (S.anger >= 3) { setTimeout(() => die('媽媽親自出門找你', '在超商亂買東西'), 900); $('sreact').textContent = note; return; } }
+  else sfx.ok();
+  $('sreact').textContent = note;
+  setTimeout(() => { if (!store || S.mode !== 'store') return; store.busy = false; store.i++; storeQ(); }, 1300);
+}
+function storeFail(msg) {
+  clearInterval(storeTimer); $('sopts').innerHTML = ''; $('sreact').textContent = msg + '（時間 +15 秒，重新排隊）'; sfx.bad(); S.time += 15;
+  setTimeout(() => { if (S.mode !== 'store') return; store = {qs:shuffle(STORE_Q).slice(0,4), i:0}; storeQ(); }, 2200);
+}
+function storeEnd() {
+  overlay(null); store = null; S.mode = 'play'; lock();
+  complete(() => T.domino.armed = false);
+  getCard('egg', '獲得', '茶葉蛋', '店員：「謝謝光臨～」');
+  lineMsg('蛋不要給我壓破。', 1800);
+}
+
+// ---------- 超市：媽媽描述的醬油 ----------
+const CAP = {'紅':'#c0392b','黃':'#e0b020','綠':'#2a8a4a'};
+let shelf = null;
+function bottleSVG(b) {
+  const h = b.tall ? 150 : 105, y = 170 - h;
+  return `<svg viewBox="0 0 80 176" width="74"><rect x="31" y="${y}" width="18" height="16" rx="3" fill="${CAP[b.cap]}"/>
+  <path d="M30 ${y+16}h20l10 20v${h-44}q0 8-8 8H28q-8 0-8-8v-${h-44}z" fill="#3a1a0a"/>
+  <rect x="22" y="${y+48}" width="36" height="40" fill="#f4ecd8"/><text x="40" y="${y+66}" font-size="11" text-anchor="middle" fill="#7a2a1a" font-weight="900">醬油</text>
+  <text x="40" y="${y+82}" font-size="12" text-anchor="middle" fill="#222" font-weight="900">${b.type}</text></svg>`;
+}
+function startShelf() {
+  S.mode = 'shelf'; unlock(); overlay('shelf');
+  const caps = Object.keys(CAP), cap = caps[(Math.random()*3)|0], tall = Math.random() < .5, type = Math.random() < .5 ? '原味' : '蔭油';
+  const other = caps.filter(c => c !== cap), nt = () => Math.random() < .5 ? '原味' : '蔭油';
+  const target = {cap, tall, type, ok:true};
+  shelf = {list:[target, {cap, tall, type:'薄鹽'}, {cap:other[0], tall, type:nt()}, {cap, tall:!tall, type:nt()}, {cap:other[1], tall:!tall, type:'薄鹽'}]};
+  $('hline').textContent = `媽媽（電話）：「就那個${cap}色蓋子的，瓶子${tall ? '比較高' : '矮矮的'}，不要買到薄鹽的喔。」`;
+  $('hreact').textContent = ''; speak('媽媽', $('hline').textContent.slice(7));
+  drawShelf();
+}
+function drawShelf() {
+  $('bottles').innerHTML = '';
+  shuffle(shelf.list).forEach(b => { const e = document.createElement('button'); e.innerHTML = bottleSVG(b); e.onclick = () => pickBottle(b); $('bottles').appendChild(e); });
+}
+function pickBottle(b) {
+  if (S.mode !== 'shelf') return;
+  if (b.ok) {
+    overlay(null); shelf = null; S.mode = 'play'; lock(); S.hasSoy = true; sfx.ok();
+    getCard('soy', '拿到了', '醬油', '還沒結帳，拿去收銀台', 1800);
+    return;
+  }
+  S.anger++; renderStats(); sfx.bad();
+  if (S.anger >= 3) { die('媽媽親自出門找你', '醬油拿錯三次'); return; }
+  speak('媽媽', '不是那個啦'); $('hreact').textContent = `媽媽：「不是那個啦！${b.type === '薄鹽' ? '我說不要薄鹽的！' : b.tall !== shelf.list[0].tall ? '瓶子不對啦！' : '蓋子顏色不對啦！'}」（媽媽怒氣 +1）`;
+  drawShelf();
+}
+
+// ---------- 點餐（T7） ----------
+let orderTimer = null, rec = null, micStream = null, volRAF = 0, orderLeft = 0, peak = 0;
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+function startOrder() {
+  S.mode = 'order'; unlock(); overlay('order');
+  $('oline').textContent = '請大聲說出你要的飲料';
+  $('heard').textContent = ''; speak('店員', '請大聲說出你要的飲料');
+  if (SR && navigator.mediaDevices?.getUserMedia) startMic(); else startCards('你的瀏覽器不支援語音辨識，改用字卡');
+}
+function orderClock(sec, onEnd) {
+  clearInterval(orderTimer); orderLeft = sec;
+  $('otime').style.width = '100%';
+  orderTimer = setInterval(() => {
+    orderLeft -= .1; $('otime').style.width = Math.max(0, orderLeft/sec*100) + '%';
+    if (orderLeft <= 0) { clearInterval(orderTimer); onEnd(); }
+  }, 100);
+}
+async function startMic() {
+  $('omic').classList.remove('hide'); $('ocard').classList.add('hide'); $('tocard').classList.remove('hide');
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({audio:true});
+  } catch (e) { startCards('找不到麥克風或沒有權限，改用字卡'); return; }
+  if (S.mode !== 'order') { stopMic(); return; }
+  const ac = audio(), src = ac.createMediaStreamSource(micStream), an = ac.createAnalyser(); an.fftSize = 1024; src.connect(an);
+  const buf = new Float32Array(an.fftSize);
+  const loop = () => { an.getFloatTimeDomainData(buf); let s = 0; for (const v of buf) s += v*v; const r = Math.sqrt(s/buf.length);
+    peak = Math.max(peak*.97, r); $('vol').style.width = Math.min(100, r*500) + '%'; volRAF = requestAnimationFrame(loop); };
+  peak = 0; loop();
+  rec = new SR(); rec.lang = 'zh-TW'; rec.continuous = true; rec.interimResults = true;
+  let loudest = 0;
+  rec.onresult = ev => {
+    let txt = '';
+    for (let i=ev.resultIndex; i<ev.results.length; i++) txt += ev.results[i][0].transcript;
+    $('heard').textContent = '店員聽到：' + txt;
+    loudest = Math.max(loudest, peak);
+    const last = ev.results[ev.results.length-1];
+    if (!last.isFinal) return;
+    if (checkTea(txt)) {
+      if (loudest < .05) { $('oline').textContent = '店員：「大聲一點，聽不到。」'; sfx.bad(); loudest = 0; return; }
+      orderOK();
+    } else { $('oline').textContent = '店員：「蛤？我們沒有賣這個。」'; sfx.bad(); }
+  };
+  rec.onerror = ev => { if (S.mode === 'order' && $('ocard').classList.contains('hide')) startCards(ev.error === 'not-allowed' ? '麥克風沒有權限，改用字卡' : '語音辨識無法使用，改用字卡'); };
+  rec.onend = () => { if (S.mode === 'order' && rec && $('ocard').classList.contains('hide')) try { rec.start(); } catch(e) {} };
+  try { rec.start(); } catch (e) { startCards('語音辨識無法啟動，改用字卡'); return; }
+  orderClock(10, () => die('社會性死亡', '店員：「下一位。」'));
+}
+function checkTea(t) {
+  t = t.replace(/\s/g, '').toUpperCase();
+  return t.includes('好喝') && t.includes('茶') && /Q|Ｑ|扣|酷|摳|求|球|KEW|CUE|KIU/.test(t);
+}
+function stopMic() {
+  cancelAnimationFrame(volRAF);
+  if (rec) { const r = rec; rec = null; r.onend = null; try { r.abort(); } catch(e) {} }
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+}
+function startCards(msg) {
+  stopMic();
+  $('omic').classList.add('hide'); $('ocard').classList.remove('hide'); $('tocard').classList.add('hide');
+  if (msg) $('oline').textContent = msg;
+  const ans = ['QQ','ㄋㄟㄋㄟ','好喝到','咩噗茶'];
+  const pool = [...ans, '奶奶', '沒撲'].sort(() => Math.random() - .5);
+  let got = [];
+  $('pick').textContent = '　';
+  $('cards').innerHTML = '';
+  pool.forEach(w => {
+    const b = document.createElement('button'); b.textContent = w;
+    b.onclick = () => {
+      if (S.mode !== 'order') return;
+      if (w !== ans[got.length]) { sfx.bad(); clearInterval(orderTimer); die('社會性死亡', `你說：「${got.join('')}${w}」`); return; }
+      sfx.ok(); got.push(w); b.classList.add('used'); $('pick').textContent = got.join('');
+      if (got.length === 4) orderOK();
+    };
+    $('cards').appendChild(b);
+  });
+  orderClock(10, () => die('社會性死亡', '店員：「下一位。」'));
+}
+$('tocard').onclick = () => startCards('改用字卡模式');
+function orderOK() {
+  clearInterval(orderTimer); stopMic(); overlay(null);
+  S.mode = 'play';
+  dialog([['店員','一杯 QQㄋㄟㄋㄟ好喝到咩噗茶，好的！']], () => {
+    complete(); lock();
+    getCard('tea', '獲得', 'QQㄋㄟㄋㄟ好喝到咩噗茶', '店員：「謝謝，大聲的客人！」');
+    setTimeout(() => {
+      $('phone').classList.remove('hide'); $('phone').classList.add('ring'); $('phint').textContent = '媽媽打來了'; sfx.ring();
+      setTimeout(() => {
+        $('phone').classList.add('hide'); $('phint').textContent = '按 F 接聽';
+        dialog([['媽媽（電話）','喂，阿明，飲料買到了嗎？'],['媽媽（電話）','回家之前，先去陳媽媽家一趟，把我上次借她的鍋子拿回來。'],['媽媽（電話）','她家在捷運站對面那條小巷子裡面。'],['媽媽（電話）','她講話比較多，你忍耐一下。'],['阿明','……蛤。']], () => {
+          renderList();
+          getCard('task', '新任務', '去陳媽媽家拿回鍋子', '地點：住宅區小巷．跟著上方的箭頭走', 3500);
+          const it = [...document.querySelectorAll('#items .it')].pop(); it && it.classList.add('new');
+        });
+      }, 1400);
+    }, 2200);
+  });
+}
+
+// ---------- 陳媽媽（T8） ----------
+const CHEN = [
+  ['資工喔？那以後就是修電腦的嘛，我家印表機壞了你順便看一下。','阿姨，印表機連工程師都修不好，這是業界共識。','好，我等一下幫你看。','資工跟修電腦沒關係好嗎。','那你讀四年到底在讀什麼？'],
+  ['現在 AI 都會寫程式了，你們讀資工的以後還有工作嗎？','所以我在學怎麼管 AI 啊。','對啊，我也很擔心。','AI 也會看病啊，志豪不也一樣。','志豪說 AI 看病會出人命，跟你們寫程式不一樣。'],
+  ['我們家志豪台大醫科，以後當醫生，至少不會被 AI 取代。','醫院系統當機的時候，志豪就會需要我了。','志豪真的好厲害喔。','資工薪水其實比醫生高。','你先畢業再說吧。'],
+  ['你是不是每天都在打電動？資工不就是打電動的科系嗎？','打電動的是玩家，我是做遊戲的，現在就在做。','嗯……有時候會打一下。','打電動也可以打職業啊。','職業？你媽知道嗎？'],
+  ['聽說你們這行三十五歲就要被淘汰了喔。','所以我打算三十歲就退休。','好像是這樣沒錯。','醫生也會過勞啊。','志豪說那叫奉獻。'],
+  ['你現在系上第幾名啊？志豪每學期都拿書卷獎。','我們系不排名次，排的是 GitHub 星星數。','我……大概中間吧。','名次不重要啦。','只有名次不好的人才會說名次不重要。'],
+  ['有女朋友了嗎？志豪的女朋友也是醫科的喔。','有啊，我的 AI 助理，每天陪我寫程式到半夜。','還沒……','我還不急啦。','不急？你媽很急喔。'],
+  ['你們寫程式的會不會很快就禿頭？電視上的工程師頭髮都很少。','禿頭代表變強，志豪還早得很。','我有在用生髮水。','醫生也很多禿頭啊。','志豪家的基因很好，不用你擔心。']
+];
+let chen = null, chenTimer = null;
+function startChen() {
+  S.mode = 'chen'; unlock(); overlay('chen');
+  const qs = [...CHEN].sort(() => Math.random() - .5);
+  chen = {hp:100, round:0, total:5, qs, busy:false};
+  chenRound();
+}
+function chenUI() {
+  $('cval').textContent = chen.hp; $('cbar').style.width = Math.max(0, chen.hp) + '%';
+  $('cround').textContent = `${chen.round+1} / ${chen.total}`;
+}
+function chenRound() {
+  if (chen.round >= chen.total) { chenEnd(); return; }
+  const q = chen.qs[chen.round % chen.qs.length];
+  chen.busy = false; chenUI();
+  $('cline').textContent = '陳媽媽：「' + q[0] + '」'; $('creact').textContent = ''; speak('陳媽媽', q[0]);
+  const opts = [[q[1],'god'],[q[2],'yes'],[q[3],'bad']].sort(() => Math.random() - .5);
+  $('copts').innerHTML = '';
+  opts.forEach(([t, k]) => { const b = document.createElement('button'); b.className = 'opt'; b.textContent = '「' + t + '」'; b.onclick = () => chenPick(k, q); $('copts').appendChild(b); });
+  $('cnext').style.display = 'none'; $('creact').style.display = 'none';
+}
+function chenPick(k, q) {
+  if (!chen || chen.busy || S.mode !== 'chen') return;
+  chen.busy = true; clearInterval(chenTimer);
+  $('copts').innerHTML = '';
+  let msg = '';
+  if (k === 'god') { msg = '陳媽媽：「……呃，這樣喔。」（陳媽媽一時說不出話）'; sfx.ok(); }
+  else if (k === 'yes') { chen.hp -= 8; msg = '陳媽媽：「對吧！志豪還……」她講得更起勁了（對話變長了）'; if (chen.total < 8) chen.total++; sfx.bad(); }
+  else if (k === 'bad') { chen.hp -= 30; msg = `陳媽媽：「${q[4]}」（阿明的心好痛）`; sfx.hit(); }
+  else { chen.hp -= 20; msg = '陳媽媽：「怎麼不講話，害羞喔？」（阿明的心有點痛）'; sfx.bad(); }
+  $('creact').textContent = msg; $('creact').style.display = ''; chenUI(); if (k !== 'god') speak('陳媽媽', msg.split('」')[0]);
+  chen.round++;
+  $('cnext').style.display = ''; $('cnext').onclick = () => { if (chen.hp <= 0) die('被陳媽媽的兒子比下去'); else chenRound(); };
+}
+$('cgive').onclick = () => {
+  if (!chen || S.mode !== 'chen' || chen.busy) return;
+  clearInterval(chenTimer); chen.hp -= 40; chenUI();
+  if (chen.hp <= 0) { $('creact').textContent = '陳媽媽：「年輕人就是沒耐心。」'; chen.busy = true; setTimeout(() => die('被陳媽媽的兒子比下去'), 1000); return; }
+  chen.round = chen.total; chenEnd('陳媽媽：「年輕人就是沒耐心，好啦拿去。」');
+};
+function chenEnd(first) {
+  clearInterval(chenTimer); overlay(null);
+  const hp = chen.hp; chen = null;
+  if (S.room === 'chen') { player.position.set(ROOMS.chen.ox, 0, ROOMS.chen.oz - 3.05); P.y = 0; }
+  const lines = [['陳媽媽', first ? first.replace(/^陳媽媽：「|」$/g, '') : '好啦，鍋子拿去。幫我跟你媽說，志豪下個月要去美國交換喔。']];
+  if (hp >= 80) lines.push(['陳媽媽','（小聲）……其實志豪也整天在打電動啦。']);
+  S.mode = 'play';
+  dialog(lines, () => { complete(); lock(); getCard('pot', '獲得', '鍋子', hp >= 80 ? '心靈幾乎沒有受傷' : hp >= 40 ? '心靈受了一點傷' : '心靈快要碎掉了'); lineMsg('陳媽媽是不是又在講志豪？不用理她。', 1800); });
+}
+
+// ---------- 路邊爭論（T5） ----------
+document.querySelectorAll('#argue .opt').forEach(b => b.onclick = () => {
+  const a = +b.dataset.a;
+  die('被捲入口水戰', ['另一邊的人把你團團圍住', '另一邊的人把你團團圍住', '兩邊一起說你是對方派來的'][a]);
+});
+
+// ---------- 下午篇流程 ----------
+function afternoon() {
+  complete(); renderList();
+  lineMsg('阿明你人呢？下午兩點二十計網，教授說今天會點名喔', 600, '計網讀書會（小慧）');
+  lineMsg('我也還在睡…等等台科門口見', 5600, '計網讀書會（阿哲）');
+  getCard('task', '下午行程', '搭捷運去台科大上課', '從市政府站搭到公館', 3000);
+}
+function enterTrain() {
+  S.cp = [30, 9.2, Math.PI/2]; S.arrived = false; S.ride = 0; enterRoom('train');
+  $('sub').textContent = '下一站，國父紀念館。Next station, Sun Yat-Sen Memorial Hall.'; $('sub').classList.remove('hide');
+}
+function leaveTrain() {
+  S.room = null; $('sub').classList.add('hide');
+  const [x, z, a] = TASKS[5].cp; player.position.set(x, 0, z); player.rotation.y = a; yaw = a + Math.PI; pitch = .32;
+  complete(); banner('公館站');
+}
+function meetFriends() {
+  azhe.lookAt(player.position.x, 0, player.position.z); xhui.lookAt(player.position.x, 0, player.position.z);
+  dialog([['小慧','你終於來了！只剩五分鐘就上課了。'],['阿哲','我也才剛到……我早上睡過頭了。'],['小慧','你們兩個每次都這樣。'],['小慧','教室在 T4 第四教學大樓 302，就是左前方那棟，我們先上去佔位子！']], () => { complete(); azhe.visible = xhui.visible = false; banner('T4 第四教學大樓'); });
+}
+let chTimer = null;
+function choiceT(name, text, opts, sec, onTimeout) {
+  choice(name, text, opts.map(([l, fn]) => [l, () => { clearInterval(chTimer); $('chbarw').classList.add('hide'); fn(); }]));
+  let left = sec; $('chbarw').classList.remove('hide'); $('chbar').style.width = '100%';
+  clearInterval(chTimer); chTimer = setInterval(() => { left -= .1; $('chbar').style.width = Math.max(0, left/sec*100) + '%';
+    if (left <= 0) { clearInterval(chTimer); $('chbarw').classList.add('hide'); if (S.mode === 'choice') onTimeout(); } }, 100);
+}
+const QUIZ = [['TCP 三向交握的第二個封包是什麼？', 'SYN-ACK', ['SYN', 'ACK', 'FIN'], '第二個是 SYN 加 ACK 啦'],
+  ['HTTP 預設使用哪個埠號？', '80', ['443', '22', '21'], '沒加密的那個，80'],
+  ['IPv4 位址總共有幾個位元？', '32', ['64', '128', '16'], '四段，每段 8 位元'],
+  ['二分搜尋的時間複雜度是？', 'O(log n)', ['O(n)', 'O(n²)', 'O(1)'], '每次砍一半，log n']];
+function startClass() {
+  const r = ROOMS.class;
+  player.position.set(r.ox - 2, -.22, r.oz + 1.15); player.rotation.y = Math.PI; yaw = 0; pitch = .3;
+  player.userData.legL.rotation.x = player.userData.legR.rotation.x = -1.5;
+  for (const [f, x] of [[xhui, -5], [azhe, 2]]) { f.visible = true; f.position.set(r.ox + x, -.22, r.oz + 1.15); f.rotation.y = Math.PI; f.userData.legL.rotation.x = f.userData.legR.rotation.x = -1.5; }
+  prof.lookAt(player.position.x, 0, player.position.z);
+  S.mode = 'classSeq';
+  dialog([['教授','好，我們開始上課。先點名。'],['教授','陳小慧。'],['小慧','有！'],['教授','王阿哲。'],['阿哲','……'],['小慧','（用筆戳阿哲）'],['阿哲','有、有！'],['教授','林阿明。']], rollCall);
+}
+function rollCall() {
+  choiceT('教授', '林阿明？', shuffle([['有！', () => { overlay(null); dialog([['教授','好。'],['教授','上禮拜講到哪……我們來抽一個人回答問題。'],['教授','……林阿明。'],['阿明','（為什麼又是我）']], quiz); }],
+    ['（還在滑手機）', () => die('點名沒到', '教授：「林阿明沒來，記缺席。」')],
+    ['他去廁所了', () => die('幫自己代答被抓包', '教授：「……你就是林阿明吧？」')]]), 4, () => die('點名沒到', '你反應太慢，教授已經點下一個人了'));
+}
+function quiz() {
+  const [q, a, wrong, hint] = QUIZ[(Math.random()*QUIZ.length)|0];
+  choiceT('教授', q, shuffle([[a, () => { overlay(null); dialog([['教授','很好，坐下。'],['小慧','（比了一個讚）'],['','教授開始講第 47 頁投影片……'],['','阿明的眼皮越來越重……']], startSleep); }],
+    ...wrong.map(w => [w, () => die('答錯被教授記住名字', `教授：「答案是 ${a}，這個期中會考喔。」`)])]), 15, () => die('答錯被教授記住名字', '你站著發呆了十五秒'));
+  setTimeout(() => { if (S.mode === 'choice') { $('chname').textContent = `教授　｜　小慧小聲說：「${hint}」`; speak('小慧', hint); } }, 3500);
+}
+function startSleep() {
+  S.mode = 'sleep'; S.drowse = 0; S.sleepT = 0; $('sleepui').classList.remove('hide');
+  azhe.userData.head.rotation.x = .6;
+}
+function updateSleep(dt) {
+  S.sleepT += dt; S.drowse += dt*.11;
+  $('fade').style.opacity = Math.min(1, S.drowse); $('sleepbar').style.width = Math.min(100, S.sleepT/12*100) + '%';
+  if (S.drowse >= 1) { $('sleepui').classList.add('hide'); S.mode = 'classSeq'; setTimeout(() => { $('fade').style.opacity = ''; die('上課睡著被教授點名', '教授：「後面那位睡覺的同學，你來回答。」'); }, 300); return; }
+  if (S.sleepT >= 12) { $('sleepui').classList.add('hide'); $('fade').style.opacity = ''; S.mode = 'classSeq';
+    dialog([['教授','好，今天就上到這裡，下課！'],['阿哲','（醒來）……下課了喔？'],['小慧','你整堂都在睡耶。筆記借你啦。'],['阿明','謝啦，我要回家了，掰掰。']], toEvening); }
+}
+function toEvening() {
+  $('fade').classList.add('on');
+  setTimeout(() => {
+    complete(); renderList(); S.momTalked = false; chenVisitor.visible = true;
+    const h = ROOMS.home; chenVisitor.position.set(h.ox - 1, -.22, h.oz - 4.05); chenVisitor.userData.legL.rotation.x = chenVisitor.userData.legR.rotation.x = -1.5;
+    enterRoom('home'); banner('傍晚．阿明家');
+    $('fade').classList.remove('on');
+  }, 700);
+}
+function momEvening() {
+  if (S.momTalked) { dialog([['媽媽','去洗澡啦。']]); return; }
+  homeMom.lookAt(player.position.x, 0, player.position.z);
+  choice('媽媽', '回來啦！今天上課怎麼樣？', [
+    ['很充實', () => choice('媽媽', '充實喔？那期中考考幾分？', [['還沒考啦', () => { S.momTalked = true; choice('媽媽', '考完記得跟我說。陳媽媽今天來家裡坐坐。', [['（離開）', () => endChoice()]]); }]])],
+    ['……睡了一點點', () => { S.momTalked = true; choice('媽媽', '學費是白繳的喔？陳媽媽在旁邊都聽到了啦！', [['（離開）', () => endChoice()]]); }],
+    ['教授點我回答問題，我答對了！', () => { S.momTalked = true; choice('媽媽', '真的？等一下跟陳媽媽講！看志豪還敢不敢……', [['（離開）', () => endChoice()]]); }]]);
+}
+function finale() {
+  dialog([['','阿明回到房間，打開電動。'],['阿明','今天真是漫長的一天……終於可以玩了。'],['媽媽（門外）','阿明！！！'],['媽媽（門外）','明天早上再去幫我買一次醬油！']], () => { $('fade').classList.add('on'); setTimeout(ending, 1000); });
+}
+
+// ---------- 結局 ----------
+function ending() {
+  S.mode = 'end'; unlock();
+  const d = S.deaths;
+  $('emom').textContent = '明天早上，阿明又要去買醬油了。';
+  const ach = Object.keys(S.ach || {});
+  $('eside').textContent = `${ach.length} / 3` + (ach.length ? '（' + ach.map(k => SIDEQ[k]).join('、') + '）' : '');
+  const ts = `${Math.floor(S.time/60)} 分 ${Math.floor(S.time%60)} 秒`;
+  $('etime').textContent = ts; $('edeath').textContent = d + ' 次';
+  const top = Object.entries(S.causes).sort((a,b) => b[1]-a[1])[0];
+  $('ecause').textContent = top ? `${top[0]}（${top[1]} 次）` : '無';
+  let best = null;
+  try { best = JSON.parse(localStorage.getItem('amin_best')); } catch(e) {}
+  if (!best || d < best.d || (d === best.d && S.time < best.t)) { best = {d, t:S.time}; try { localStorage.setItem('amin_best', JSON.stringify(best)); } catch(e) {} }
+  $('ebest').textContent = `死亡 ${best.d} 次．${Math.floor(best.t/60)} 分 ${Math.floor(best.t%60)} 秒`;
+  let win = 0, money = 0;
+  for (let i=0; i<(S.rc||0); i++) { const r = Math.random(); if (r < .02) { win++; money += 1000; } else if (r < .14) { win++; money += 200; } }
+  $('ercpt').textContent = !S.rc ? '一張都沒撿' : win ? `${S.rc} 張中了 ${win} 張，共 ${money} 元。媽媽：「錢我先幫你保管。」` : `${S.rc} 張全部槓龜。媽媽：「連發票都對不中。」`;
+  sfx.buy(); overlay('end');
+}
+$('again').onclick = () => { Object.assign(S, {stage:0, deaths:0, causes:{}, time:0, cp:HOME_CP, rc:0, crossed:[false,false], ach:{}, kDone:false, momTalked:false}); $('fade').classList.remove('on');
+  { azhe.visible = xhui.visible = true; azhe.position.set(FR[0][0], 0, FR[0][1]); xhui.position.set(FR[1][0], 0, FR[1][1]); azhe.rotation.set(0, FRY, 0); xhui.rotation.set(0, FRY, 0); azhe.userData.head.rotation.x = 0; for (const f of [azhe, xhui]) f.userData.legL.rotation.x = f.userData.legR.rotation.x = 0; } receipts.forEach(r => r.visible = true); renderList(); respawn(); };
+
+// ---------- 開場 ----------
+try { const b = JSON.parse(localStorage.getItem('amin_best')); if (b) $('best').textContent = `最佳紀錄：死亡 ${b.d} 次．${Math.floor(b.t/60)} 分 ${Math.floor(b.t%60)} 秒`; } catch(e) {}
+let introT = -1;
+$('start').onclick = () => {
+  audio(); musicBus.gain.value = $('mvol').value/100; master.gain.value = .7 * $('svol').value/100; if (musicOn) startMusic();
+  $('title').classList.add('hide'); $('hud').classList.remove('hide');
+  S.stage = 0; $('items').innerHTML = '<div class="it">（等媽媽說完）</div>'; renderStats();
+  player.position.set(HOME_CP[0], 0, HOME_CP[1]); yaw = 0; player.rotation.y = Math.PI;
+  resetTraps();
+  S.mode = 'intro'; introT = 0; introFading = false; player.visible = false; shadow.visible = false; lock();
+};
+function introDone() {
+  if (S.mode !== 'intro' && !TEST) return;
+  S.mode = 'play'; player.visible = true; shadow.visible = true;
+  enterRoom('home'); const r = ROOMS.home;
+  player.position.set(r.ox - .6, 0, r.oz - 1); player.rotation.y = Math.PI*.6; yaw = player.rotation.y + Math.PI;
+  homeMom.lookAt(player.position.x, 0, player.position.z);
+  dialog([['媽媽','阿明！一大早就在打電動！'],['媽媽','去幫我買東西，買不齊不准回來。'],['媽媽','巷口便利商店的茶葉蛋、超市的醬油，還有 101 那邊的……那個……'],['媽媽','QQㄋㄟㄋㄟ好喝到咩噗茶。'],['阿明','……好啦。'],['','手機收到媽媽的購物清單']], () => { renderList(); });
+}
+
+// ---------- 主迴圈 ----------
+const clock = new THREE.Clock();
+const ray = new THREE.Ray(), tmpV = new THREE.Vector3(), hit = new THREE.Vector3();
+
+function collide(nx, nz) {
+  const r = .4;
+  for (const s of solids) if (nx > s.x1-r && nx < s.x2+r && nz > s.z1-r && nz < s.z2+r && P.y < s.h) return true;
+  for (const s of rsolids) { const dx = nx - s.cx, dz = nz - s.cz, lx = dx*s.c - dz*s.s, lz = dx*s.s + dz*s.c; if (Math.abs(lx) < s.hw + r && Math.abs(lz) < s.hd + r && P.y < s.h) return true; }
+  return false;
+}
+function onStep(x, z) { return x > STEP.x1 && x < STEP.x2 && z > STEP.z1 && z < STEP.z2; }
+function onRoad() { const p = player.position; return p.x > -110 && p.x < 120 && p.z > -6.6 && p.z < 6.6; }
+function crossIdx() { const x = player.position.x; return CW.findIndex(c => x > c.x1-1 && x < c.x2+1); }
+
+function updatePlayer(dt) {
+  const can = S.mode === 'play' && S.frozen <= 0 && T.trip <= 0;
+  let ix = 0, iz = 0;
+  if (can) { if (keys.KeyW) iz++; if (keys.KeyS) iz--; if (keys.KeyD) ix++; if (keys.KeyA) ix--; }
+  P.run = !!(keys.ShiftLeft || keys.ShiftRight);
+  const fx = -Math.sin(yaw), fz = -Math.cos(yaw), rx = Math.cos(yaw), rz = -Math.sin(yaw);
+  let dx = fx*iz + rx*ix, dz = fz*iz + rz*ix;
+  const len = Math.hypot(dx, dz);
+  const sp = len ? (P.run ? 10 : 5) : 0;
+  if (len) { dx /= len; dz /= len;
+    const tgt = Math.atan2(dx, dz); let df = tgt - player.rotation.y; df = Math.atan2(Math.sin(df), Math.cos(df)); player.rotation.y += df * Math.min(1, dt*14); }
+  P.spd = sp; P.vx = dx*sp; P.vz = dz*sp;
+  const p = player.position;
+  const nx = p.x + dx*sp*dt, nz = p.z + dz*sp*dt;
+  if (!collide(nx, p.z)) p.x = nx;
+  if (!collide(p.x, nz)) p.z = nz;
+  const gy = onStep(p.x, p.z) ? STEP.h : 0;
+  P.vy -= 16*dt; P.y = Math.max(gy, P.y + P.vy*dt); if (P.y === gy && P.vy < 0) P.vy = 0;
+  p.y = P.y;
+  animP(player, sp, dt);
+  shadow.position.set(p.x, .05, p.z);
+}
+
+function updateCamera(dt) {
+  const p = player.position;
+  const tgt = tmpV.set(p.x, p.y + 1.6, p.z);
+  const dist = 5.5;
+  const off = new THREE.Vector3(Math.sin(yaw)*Math.cos(pitch), Math.sin(pitch), Math.cos(yaw)*Math.cos(pitch));
+  ray.set(tgt, off);
+  let d = dist;
+  for (const b of camBoxes) if (ray.intersectBox(b, hit)) { const h = hit.distanceTo(tgt); if (h < d) d = Math.max(.6, h - .3); }
+  cam.position.copy(tgt).addScaledVector(off, d);
+  if (cam.position.y < .3) cam.position.y = .3;
+  cam.lookAt(tgt);
+}
+
+function killDist(obj, r) { return Math.hypot(obj.position.x - player.position.x, obj.position.z - player.position.z) < r; }
+
+function updateTraps(dt) {
+  const p = player.position;
+  for (const r of receipts) if (r.visible && Math.hypot(r.position.x - p.x, r.position.z - p.z) < 1.2 && Math.abs(P.y + 1 - r.position.y) < 1.4) {
+    r.visible = false; S.rc = (S.rc||0) + 1; tone(1400, .08, 'square', .1); tone(1800, .1, 'square', .1, .07); renderStats();
+  }
+  // T1
+  const D = T.domino;
+  if (D.armed && !D.on && p.x < -56.5 && p.x > -63.5 && p.z < 44.5 && p.z > 14) { D.on = true; D.t = 0; sfx.hit(); }
+  if (D.on) {
+    D.t += dt;
+    scooters.forEach((s, i) => {
+      const lt = D.t - i*.25;
+      if (lt < 0) return;
+      const f = Math.min(1, lt/.25); s.rotation.z = f * Math.PI/2 * .95;
+      if (lt > .25) s.position.x = -57.8 - Math.min(1, (lt-.25)/.25) * 3.5;
+      if (lt > .12 && lt < .6 && Math.abs(p.z - s.userData.z) < 1.1 && p.x > -63 && p.x < -56.5 && P.y < .9) die('被機車骨牌壓扁');
+      if (lt > .18 && lt < .22) tone(120 + i*8, .08, 'square', .08);
+    });
+  }
+  // T2
+  if (T.trip <= 0 && P.run && P.spd > 0 && onStep(p.x, p.z) && P.y < STEP.h + .1) {
+    T.trip = 1.2; T.tripC = ['被騎樓絆倒', '踢到翹起來的地磚，摔出騎樓被外送機車撞到']; sfx.hit(); banner('！？');
+  }
+  if (S.room === 'cvs' && T.trip <= 0 && P.run && P.spd > 0) {
+    const r = ROOMS.cvs, [a, b, c, d] = r.wet, lx = p.x - r.ox, lz = p.z - r.oz;
+    if (lx > a && lx < b && lz > c && lz < d) { T.trip = 1; T.tripC = ['在便利商店滑倒', '地板剛拖過，你用跑的']; sfx.hit(); }
+  }
+  if (S.room === 'cvs') ROOMS.cvs.steam.forEach(m => { const k = (performance.now()/1400 + m.userData.k/3) % 1; m.position.y = 1.3 + k*1.1; m.material.opacity = .35*(1-k); m.scale.setScalar(.6 + k); });
+  if (S.room === 'mkt') {
+    const r = ROOMS.mkt, lx = p.x - r.ox, lz = p.z - r.oz;
+    if (!T.aunt && Math.hypot(lx + 6.1, lz - 3.9) < 2.2 && S.mode === 'play') { T.aunt = true; auntTalk(); }
+    const C = T.cart;
+    if (C.st === 'idle' && lx > -6.6 && lx < -3.4 && lz < 1.5 && lz > -6) { C.st = 'roll'; C.x = clamp(lx, -6.2, -3.8); r.cart.position.set(r.ox + C.x, 0, r.oz - 7); for (let i=0; i<6; i++) tone(rand(150,250), .05, 'square', .06, i*.07); }
+    if (C.st === 'roll') {
+      r.cart.position.z += 9*dt; r.cart.rotation.y = Math.sin(performance.now()/60)*.08;
+      if (Math.hypot(r.cart.position.x - p.x, r.cart.position.z - p.z) < .85 && P.y < .75) die('被購物推車撞飛', '不知道誰放的推車自己滑了過來');
+      if (r.cart.position.z > r.oz + 4.5) C.st = 'stop';
+    }
+  }
+  if (T.trip > 0) {
+    T.trip -= dt;
+    player.rotation.x = Math.min(Math.PI/2, player.rotation.x + dt*5);
+    if (T.trip <= 0) { player.rotation.x = 0; die(T.tripC[0], T.tripC[1]); }
+  } else player.rotation.x = 0;
+  // T3
+  const Z = T.zombie;
+  const zd = Math.hypot(zombie.position.x - p.x, zombie.position.z - p.z);
+  if (Z.st === 'idle') { zombie.rotation.y = 0; zombie.userData.head.rotation.z = Math.sin(performance.now()/300)*.15; if (zd < 8 && p.z > 12) { Z.st = 'turn'; Z.t = 0; zbub.material.map = bubble('！！', '#c0392b').material.map; } }
+  else if (Z.st === 'turn') { Z.t += dt; zombie.rotation.y = Math.PI * Math.min(1, Z.t/.7) + Math.sin(Z.t*40)*.2; if (Z.t > .7) { Z.st = 'chase'; Z.t = 0; tone(90, .6, 'sawtooth', .2, 0, 300); } }
+  else if (Z.st === 'chase') {
+    Z.t += dt;
+    const ang = Math.atan2(p.x - zombie.position.x, p.z - zombie.position.z);
+    zombie.rotation.y = ang;
+    zombie.position.x = clamp(zombie.position.x + Math.sin(ang)*7.5*dt, -23.5, 5.5);
+    zombie.position.z = clamp(zombie.position.z + Math.cos(ang)*7.5*dt, 34.5, 39.5);
+    zombie.userData.armL.rotation.x = zombie.userData.armR.rotation.x = -1.5 + Math.sin(Z.t*30)*.3;
+    zombie.userData.legL.rotation.x = Math.sin(Z.t*18)*.9; zombie.userData.legR.rotation.x = -Math.sin(Z.t*18)*.9;
+    if (Z.t > 4) Z.st = 'stand';
+  } else { zombie.userData.head.rotation.z = Math.sin(performance.now()/90)*.3; }
+  if (Z.st !== 'idle' && zd < .9) die('被喪屍煙彈客撲倒');
+  // T4 紅綠燈與車
+  const green = pedGreen();
+  SIG.pg.color.set(green ? 0x22ff66 : 0x113322); SIG.pr.color.set(green ? 0x331111 : 0xff2a2a); SIG.cr.color.set(green ? 0xff2a2a : 0x331111); SIG.cg.color.set(green ? 0x113322 : 0x22ff66);
+  const ci = crossIdx();
+  const ped = ci >= 0 && onRoad();
+  for (const c of cars) {
+    const u = c.userData;
+    let v = u.v;
+    if (green) for (const w of CW) {
+      const stop = u.dir > 0 ? w.x1 - 3 : w.x2 + 3;
+      const ahead = (stop - c.position.x) * u.dir;
+      if (ahead > 0 && ahead < 8) v = Math.max(0, v * Math.min(1, (ahead-1)/7));
+    }
+    u.cur += (v - u.cur) * Math.min(1, dt*3);
+    c.position.x += u.cur * u.dir * dt;
+    if (c.position.x > 112) c.position.x = -100; if (c.position.x < -100) c.position.x = 112;
+    if (S.mode === 'play' && Math.abs(c.position.x - p.x) < u.hw && Math.abs(c.position.z - p.z) < 1.1) die('闖紅燈被撞');
+  }
+  const Dk = T.drunk;
+  S.crossed ||= [false, false];
+  const nowRoad = onRoad();
+  if (nowRoad && !T.wasRoad && !green && S.mode === 'play') die('闖紅燈被撞', '紅燈還敢過馬路');
+  T.wasRoad = nowRoad;
+  if (ped && green && !S.crossed[ci] && !Dk.fired[ci] && !Dk.on) {
+    Dk.fired[ci] = true; Dk.on = true; Dk.t = 0; Dk.z = 0; Dk.dir = ci === 0 ? 1 : -1; Dk.kind = ci;
+    drunkCar.visible = true; drunkCar.position.set(p.x - Dk.dir*52, 0, 0); drunkCar.rotation.y = Dk.dir > 0 ? 0 : Math.PI;
+    sfx.honk(); setTimeout(sfx.honk, 500);
+    dbub.material.map = bubble(ci === 0 ? '趕時間啦！讓開讓開！' : '呃～我很清醒啦', '#c0392b').material.map;
+  }
+  if (!nowRoad) for (const k of [0, 1]) if (Dk.fired[k] && !Dk.on) S.crossed[k] = true;
+  if (Dk.on) {
+    Dk.t += dt;
+    drunkCar.position.x += Dk.dir * 19 * dt;
+    const near = Math.abs(drunkCar.position.x - p.x) < 20 && onRoad();
+    Dk.z = near ? Dk.z + clamp(p.z - Dk.z, -9*dt, 9*dt) : Math.sin(Dk.t*3.2) * 4.2;
+    drunkCar.position.z = Dk.z;
+    drunkCar.rotation.y = (Dk.dir > 0 ? 0 : Math.PI) - Math.cos(Dk.t*3.2)*.35*Dk.dir;
+    if (Math.abs(drunkCar.position.x - p.x) < 2.4 && Math.abs(drunkCar.position.z - p.z) < 1.4) Dk.kind === 0 ? die('被闖紅燈的車撞飛', '明明是行人綠燈') : die('被酒駕撞飛');
+    if (Dk.t > 6) { Dk.on = false; drunkCar.visible = false; if (!onRoad()) S.crossed[Dk.kind] = true; }
+  }
+  // T5
+  argGroup.children.forEach((m, i) => { m.userData.armR.rotation.x = -2.4 + Math.sin(performance.now()/180 + i)*.5;
+    if (m.userData.bub && Math.random() < dt*.4) m.userData.bub.material.map = bubble(m.userData.lines[(Math.random()*3)|0], m.userData.col).material.map; });
+  if (!T.argued && Math.hypot(p.x - ARG.x, p.z - ARG.z) < ARG.r && S.mode === 'play') {
+    T.argued = true; S.mode = 'argue'; unlock(); overlay('argue'); sfx.bad();
+  }
+  // T6
+  const C = T.cust;
+  if (C.st === 'idle' && Math.hypot(p.x - SB.x, p.z - SB.z) < 9) {
+    C.st = 'out'; C.t = 0; customer.visible = true; cbub.visible = true; customer.position.set(54, 0, -43.4); customer.rotation.y = 0; cbub.material.map = bubble('我的咖啡呢！', '#1d6b4a').material.map;
+    tone(300, .3, 'sawtooth', .15, 0, 600);
+  }
+  if (C.st === 'out') {
+    C.t += dt; customer.position.z = -43.4 + Math.min(1, C.t/.5)*2;
+    customer.lookAt(p.x, 0, p.z);
+    animP(customer, C.t < .5 ? 3 : 0, dt);
+    const RANT = [[.5, '是誰說要漲價的！'], [1.7, '漲漲漲，什麼都在漲！'], [3.0, '就是薪水沒在漲！'], [4.2, '真的是夠了！']];
+    for (const [t0, line] of RANT) if (C.t - dt < t0 && C.t >= t0) { cbub.material.map = bubble(line, '#1d6b4a').material.map; cbub.scale.set(3.6, .9, 1); speak('客人', line); $('sub').textContent = '客人：「' + line + '」'; $('sub').classList.remove('hide'); }
+    customer.userData.armL.rotation.x = C.t > .5 && C.t < 4.6 ? -1 + Math.sin(C.t*9)*.6 : 0;
+    customer.userData.armR.rotation.x = C.t > 4.6 ? -2.8 + (C.t-4.6)*8 : C.t > .5 ? -1 - Math.sin(C.t*9)*.6 : 0;
+    if (C.t > 5) { C.st = 'fly'; C.t = 0; cup.visible = true; $('sub').classList.add('hide'); C.from = new THREE.Vector3(customer.position.x, 2, customer.position.z); }
+  }
+  if (C.st === 'fly') {
+    C.t += dt; const f = Math.min(1, C.t/.75);
+    const tx = p.x, tz = p.z;
+    cup.position.set(C.from.x + (tx - C.from.x)*f, C.from.y*(1-f) + 1.2*f + Math.sin(f*Math.PI)*3, C.from.z + (tz - C.from.z)*f);
+    cup.rotation.x += dt*12; cup.rotation.z += dt*7;
+    if (f >= 1) { C.st = 'back'; C.t = 0; sfx.hit(); die('被半杯拿鐵砸中', '只有半杯，但砸到還是很痛'); }
+  }
+  if (C.st === 'back') {
+    C.t += dt; cbub.visible = false;
+    customer.rotation.y = Math.PI; customer.position.z -= dt*3; animP(customer, 3, dt);
+    if (customer.position.z < -43.6) { customer.visible = false; C.st = 'gone'; }
+  }
+  // 下午篇：捷運
+  if (S.room === 'train') {
+    S.ride += dt; ROOMS.train.tunnel.offset.x += dt*(S.arrived ? 0 : 1.6);
+    cam.position.x += Math.sin(performance.now()/90)*.02;
+    if (S.ride > 1.5 && S.ride - dt <= 1.5) { $('sub').textContent = '（腳好痠……車廂最後面剛好有一個空位）'; $('sub').classList.remove('hide'); }
+    if (ROOMS.train.seatGlow) ROOMS.train.seatGlow.material.opacity = .35 + Math.sin(performance.now()/250)*.2;
+    if (S.ride > 7 && S.ride - dt <= 7) $('sub').textContent = '下一站，古亭……（你閉上眼睛跳過了幾站）';
+    if (S.ride > 9 && S.ride - dt <= 9) { $('sub').textContent = '列車即將緊急煞車，請緊握扶手！'; $('sub').classList.remove('hide'); banner('緊急煞車！'); for (let i=0; i<4; i++) tone(900, .15, 'square', .12, i*.3); }
+    if (S.ride > 9 && S.ride < 12) cam.position.x += Math.sin(performance.now()/40)*.06;
+    if (S.ride > 12 && S.ride - dt <= 12) {
+      const r = ROOMS.train, lx = player.position.x - r.ox, lz = player.position.z - r.oz;
+      const near = [-6, -1, 1, 6].some(x => Math.hypot(lx - x, lz) < 1.2) || Math.abs(lz) > 1.4;
+      tone(120, .5, 'sawtooth', .2, 0, 60);
+      if (!near && S.mode !== 'dead') die('捷運急煞跌倒', '沒抓扶手，整個人飛到車廂另一頭');
+      else $('sub').textContent = '（列車猛然煞住，還好你抓住了扶手）';
+    }
+    if (S.ride > 15 && S.ride - dt <= 15) $('sub').textContent = '下一站，公館。Next station, Gongguan. 往新店方向的旅客……';
+    if (S.ride > 21 && !S.arrived) { S.arrived = true; $('sub').textContent = '公館站到了，請從右側車門下車。'; banner('公館站到了'); tone(880, .3, 'sine', .15); tone(660, .4, 'sine', .15, .3); }
+  }
+  // 下午篇：公館
+  if (p.x < -300 && S.mode === 'play') {
+    const s0 = segInfo(LEG[0], LEG[1], p);
+    const U = T.sus;
+    if (U.st === 'idle' && S.stage === 6 && s0.t > 28 && s0.t < 95 && Math.abs(s0.off) < 6) {
+      U.st = 'call'; U.t = 0; U.wt = s0.t - 42; susBub.visible = true;
+      $('sub').textContent = '背後傳來：「速速咩──！！」快閃到路邊！'; $('sub').classList.remove('hide'); speak('阿哲', '速速咩速速咩'); for (let i=0; i<6; i++) tone(200 + i*40, .15, 'sawtooth', .08, i*.12);
+    }
+    if (U.st === 'call' || U.st === 'run') {
+      U.t += dt; if (U.t > .6) U.st = 'run';
+      if (U.st === 'run') U.wt += 24*dt;
+      const L = s0.L;
+      for (const g of SUS) { const t = U.wt - g.userData.r*2.6, o = -2.4 + g.userData.c*1.6, [x, z] = along(0, t, o);
+        g.visible = t > -5 && t < L + 5; g.position.set(x, 0, z); g.rotation.y = segAng(LEG[0], LEG[1]);
+        g.userData.p.userData.legL.rotation.x = -1.1 + Math.sin(performance.now()/80)*.4;
+        if (U.st === 'run' && Math.abs(t - s0.t) < 1.1 && Math.abs(o - s0.off) < 1.4 && P.y < .9) die('被速速咩大軍輾過', '他們喊著「速速咩」從你身上騎了過去'); }
+      { const [x, z] = along(0, U.wt, 0); susBub.position.set(x, 3.4, z); }
+      if (U.wt - 6 > s0.t + 8) { if (U.st !== 'done') { $('sub').classList.add('hide'); const last = SUS[SUS.length-1]; } }
+      if (U.wt > L + 20) { U.st = 'done'; SUS.forEach(g => g.visible = false); susBub.visible = false; $('sub').classList.add('hide'); }
+    }
+    if (S.stage === 6 && Math.hypot(FR[0][0] - p.x, FR[0][1] - p.z) < 6) meetFriends();
+    doorArrow.visible = S.stage === 7; if (doorArrow.visible) doorArrow.position.set(T4DOOR[0] - KN[0]*1.5, 4.6 + Math.sin(performance.now()/250)*.25, T4DOOR[1] - KN[1]*1.5);
+    // 管理學院前的鳥
+    const s1 = segInfo(LEG[1], LEG[2], p);
+    const underTrees = S.stage === 6 && s1.t > 50 && s1.t < 96 && Math.abs(s1.off) < 7;
+    T.birdT = (T.birdT || 0) - dt;
+    if (underTrees && T.birdT <= 0) {
+      T.birdT = 1.3; const b = BIRDS.find(b => b.t < 0);
+      if (b) { b.t = 0; b.x = p.x + P.vx*.5 + rand(-.6, .6); b.z = p.z + P.vz*.5 + rand(-.6, .6); b.sh.position.set(b.x, .05, b.z); b.sh.visible = true; b.ball.visible = false;
+        if (!T.birdWarn) { T.birdWarn = true; $('sub').textContent = '頭上的樹傳來一大群鳥叫聲……'; $('sub').classList.remove('hide'); setTimeout(() => $('sub').classList.add('hide'), 2500); } tone(2400, .06, 'sine', .05); tone(2800, .06, 'sine', .05, .08); }
+    }
+    for (const b of BIRDS) if (b.t >= 0) {
+      b.t += dt; b.sh.material.opacity = Math.min(.45, b.t*.4); b.sh.scale.setScalar(.5 + b.t*.5);
+      if (b.t > .7) { b.ball.visible = true; b.ball.position.set(b.x, Math.max(.1, 8 - (b.t - .7)*18), b.z); }
+      if (b.t > 1.15) { b.t = -1; b.sh.visible = false; b.ball.visible = false; tone(200, .08, 'square', .06);
+        if (Math.hypot(b.x - p.x, b.z - p.z) < .75) die('被鳥屎命中', '管理學院前的大樹上住了一整群鳥'); }
+    }
+    // 雅頌廣場的畢業照
+    T.gradT = ((T.gradT || 0) + dt) % 7;
+    const gp2 = T.gradT, cd = gp2 >= 3 && gp2 < 6 ? 3 - Math.floor(gp2 - 3) : 0;
+    if (cd !== T.gradCd) { T.gradCd = cd; gradBub.material.map = bubble(cd ? `${cd}！` : gp2 >= 6 ? '（喀嚓）好，再一張！' : '來～大家看這邊！', '#2a3a5a').material.map; if (cd) tone(700, .1, 'sine', .08); }
+    if (cd && Math.abs(s1.t - GRAD_T) < 2.6 && Math.abs(s1.off) < 5.5) die('闖進別人的畢業照', '照片裡永遠留下了你的背影');
+    // 醉月湖的鵝
+    const G0 = T.goose, gd = Math.hypot(goose.position.x - p.x, goose.position.z - p.z);
+    if (G0.st === 'idle') { goose.rotation.y += dt*.4; if (gd < 11) { G0.st = 'chase'; G0.t = 0; gooseBub.visible = true; tone(700, .15, 'sawtooth', .12); tone(650, .15, 'sawtooth', .12, .18); } }
+    else if (G0.st === 'chase') {
+      G0.t += dt; const a = Math.atan2(p.x - goose.position.x, p.z - goose.position.z);
+      goose.rotation.y = a; goose.position.x += Math.sin(a)*6.8*dt; goose.position.z += Math.cos(a)*6.8*dt; goose.position.y = Math.abs(Math.sin(G0.t*14))*.12;
+      if (gd < .8) die('被醉月湖的鵝追咬', '那隻鵝追了你整整一圈醉月湖');
+      if (gd > 22 || G0.t > 7) { G0.st = 'give'; gooseBub.visible = false; goose.position.y = 0; achieve('goose'); }
+    }
+    // 基隆路
+    const KK = window.__K, kv = {x:p.x - KK.KC[0], z:p.z - KK.KC[1]};
+    const kt = kv.x*KK.KU[0] + kv.z*KK.KU[1], ko = -kv.x*KK.KU[1] + kv.z*KK.KU[0];
+    const g2 = kGreen(), onK = Math.abs(ko) < 12 && Math.abs(kt) < 6;
+    KSIG.g.color.set(g2 ? 0x22ff66 : 0x113322); KSIG.r.color.set(g2 ? 0x331111 : 0xff2a2a);
+    if (onK && !T.kRoad && !g2) die('基隆路闖紅燈', '基隆路的紅燈有 22 秒，你等不到');
+    if (onK && !T.kRoad && g2 && !S.kDone && T.kw.st === 'idle') {
+      T.kw.st = 'go'; T.kw.t = -45; kwBub.visible = true; for (let i=0; i<10; i++) tone(rand(160, 260), .08, 'square', .06, i*.06);
+      $('sub').textContent = '遠處傳來一大片引擎聲……'; $('sub').classList.remove('hide');
+    }
+    T.kRoad = onK;
+    if (T.kw.st === 'go') {
+      T.kw.t += 16*dt;
+      for (const c of KWAVE) { const t = T.kw.t - c.userData.row*3, [x, z] = KK.kp(t, c.userData.o); c.visible = true; c.position.set(x, 0, z); c.rotation.y = Math.atan2(-KK.KU[1], KK.KU[0]);
+        if (Math.abs(t - kt) < 1.2 && Math.abs(c.userData.o - ko) < 1.3) die('被機車瀑布淹沒', '綠燈一亮，機車從待轉區一起衝了出來'); }
+      { const [x, z] = KK.kp(T.kw.t, 0); kwBub.position.set(x, 3.2, z); }
+      if (T.kw.t > 60) { T.kw.st = 'done'; KWAVE.forEach(c => c.visible = false); kwBub.visible = false; $('sub').classList.add('hide'); if (!onK) S.kDone = true; }
+    }
+    if (T.kw.st === 'done' && !onK) S.kDone = true;
+  }
+  // T9 媽媽來電
+  if (S.mode === 'play' && S.stage < 8 && !['mkt','chen','train','class'].includes(S.room)) {
+    if (S.frozen > 0) { S.frozen -= dt; if (S.frozen <= 0) $('sub').classList.add('hide'); }
+    if (S.ring > 0) {
+      S.ring -= dt;
+      if ((S.ring * 2 | 0) !== ((S.ring + dt) * 2 | 0)) sfx.ring();
+      if (S.ring <= 0) {
+        $('phone').classList.add('hide'); S.anger++; renderStats(); S.nextCall = rand(25, 40);
+        if (S.anger >= 3) { T.momCome = 1.6; momP.visible = true;
+          momP.position.set(p.x + Math.sin(player.rotation.y)*3, 0, p.z + Math.cos(player.rotation.y)*3); momP.lookAt(p.x, 0, p.z); S.frozen = 2; tone(200, .8, 'sawtooth', .2, 0, 600); }
+      }
+    } else if (S.nextCall > 0 && S.frozen <= 0) {
+      S.nextCall -= dt;
+      if (S.nextCall <= 0) { S.ring = 5; $('phone').classList.remove('hide'); $('phone').classList.add('ring'); }
+    }
+  }
+  if (T.momCome > 0) { T.momCome -= dt; if (T.momCome <= 0) die('媽媽親自出門找你', '怒氣值滿了'); }
+}
+
+function updateKCars(dt) {
+  kLightT += dt;
+  const KK = window.__K, g2 = kGreen();
+  for (const c of KCARS) {
+    const u = c.userData; let v = u.v;
+    if (g2) { const ahead = (-6*u.dir - u.t)*u.dir; if (ahead > 0 && ahead < 10) v = Math.max(0, v*Math.min(1, (ahead-1)/9)); }
+    u.cur += (v - u.cur)*Math.min(1, dt*3); u.t += u.cur*u.dir*dt;
+    if (u.t > 150) u.t = -150; if (u.t < -150) u.t = 150;
+    const [x, z] = KK.kp(u.t, u.off); c.position.set(x, 0, z); c.rotation.y = Math.atan2(-KK.KU[1], KK.KU[0]) + (u.dir < 0 ? Math.PI : 0);
+    if (S.mode === 'play' && Math.hypot(x - player.position.x, z - player.position.z) < (u.hw > 2 ? 2.2 : 1.1)) die('基隆路闖紅燈', '被基隆路上的車撞到');
+  }
+}
+function updateWorld(dt) {
+  if (player.position.x < -300) updateKCars(dt);
+  window.__sky.position.copy(cam.position); window.__mtn.position.set(cam.position.x, 0, cam.position.z);
+  sun.position.copy(player.position).add(SUN_OFF); sun.target.position.copy(player.position);
+  lightT += dt;
+  const now = performance.now()/1000;
+  for (const n of NPCS) { n.bub.position.y = 2.25 + Math.sin(now*3 + n.at[0])*.05; n.bub.visible = cam.position.distanceTo(n.obj.position) > 4; }
+  for (const w of walkers) {
+    w.position.x += w.userData.v*dt;
+    if (w.position.x < w.userData.r[0] || w.position.x > w.userData.r[1]) w.userData.v *= -1;
+    w.rotation.y = w.userData.v > 0 ? Math.PI/2 : -Math.PI/2; animP(w, Math.abs(w.userData.v), dt);
+  }
+  for (const r of receipts) if (r.visible) { r.rotation.y += dt*2; r.position.y = 1 + Math.sin(now*3 + r.userData.k)*.15; }
+}
+
+function updateHUD(dt) {
+  const t = TASKS[S.stage];
+  if (S.room && (S.mode === 'play' || S.mode === 'dialog')) {
+    const r = ROOMS[S.room], acts = roomActs();
+    const R = S.room;
+    const done = R === 'cvs' ? S.stage > 0 : R === 'mkt' ? S.stage > 1 : R === 'chen' ? S.stage > 3 : R === 'home' ? S.stage !== 4 : false;
+    const have = R === 'cvs' ? S.hasEgg : R === 'mkt' ? S.hasSoy : false;
+    let goal = done ? acts[R === 'home' ? 1 : acts.length-1] : have ? acts[1] : acts[0];
+    if (R === 'train') goal = acts[2];
+    if (R === 'class') goal = S.stage === 7 ? acts[0] : acts[1];
+    if (R === 'home' && S.stage >= 8) goal = S.momTalked ? acts[5] : acts[0];
+    const gx = r.ox + goal.x, gz = r.oz + goal.z;
+    const ang = Math.atan2(gx - player.position.x, gz - player.position.z), camAng = Math.atan2(-Math.sin(yaw), -Math.cos(yaw));
+    let rel = ang - camAng; rel = Math.atan2(Math.sin(rel), Math.cos(rel));
+    $('arrow').style.transform = `rotate(${-rel}rad)`;
+    $('navt').textContent = R === 'train' ? (S.arrived ? '下車' : '等待到站') : R === 'class' ? (S.stage === 7 ? '找位子' : '離開') : R === 'home' && S.stage >= 8 ? (S.momTalked ? '回房間' : '跟媽媽說話') : done ? (R === 'home' ? '出門' : '離開') : have ? '去結帳' : ({cvs:'找茶葉蛋', mkt:'找醬油', chen:'找陳媽媽', home:'交給媽媽'})[R];
+    $('nav').classList.remove('hide');
+  } else if (t && (S.mode === 'play' || S.mode === 'dialog')) {
+    const wps = t.wp; S.wp ||= 0;
+    const dd = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]), pp = [player.position.x, player.position.z];
+    while (S.wp < wps.length-1 && (dd(pp, wps[S.wp]) < 4.5 || dd(pp, wps[S.wp+1]) < dd(wps[S.wp], wps[S.wp+1]))) S.wp++;
+    const [tx, tz] = wps[S.wp];
+    const ang = Math.atan2(tx - player.position.x, tz - player.position.z);
+    const camAng = Math.atan2(-Math.sin(yaw), -Math.cos(yaw));
+    let rel = ang - camAng; rel = Math.atan2(Math.sin(rel), Math.cos(rel));
+    $('arrow').style.transform = `rotate(${-rel}rad)`;
+    $('navt').textContent = `${t.label.split('：')[0]}　${Math.round(Math.hypot(t.door[0]-player.position.x, t.door[1]-player.position.z))} m`;
+    $('nav').classList.remove('hide');
+  } else $('nav').classList.add('hide');
+  if (S.room) { const a = S.mode === 'play' && nearAct(); prompt(a ? '按 E　' + a.label : ''); }
+  else { const d = S.mode === 'play' && nearDoor();
+    const n = !d && S.mode === 'play' && nearNPC();
+    prompt(d ? `按 E　${({egg:'進入便利商店', soy:'進入超市', tea:'跟店員點餐', pot:'按陳媽媽家的電鈴', home:'回家', mrt:'搭捷運', ntust:'跟朋友打招呼', class:'進教學大樓'})[d.key]}` : n ? `按 E　跟${n.name}說話` : ''); }
+  const p = player.position;
+  const z = ZONES.find(([n, x1, x2, z1, z2]) => p.x > x1 && p.x < x2 && p.z > z1 && p.z < z2);
+  let zn = z ? z[0] : '';
+  { const dx = p.x - CO[0], dz = p.z - CO[1], v = dx*KN[0] + dz*KN[1], u = -(dx*KU0[0] + dz*KU0[1]); if (v > 0 && v < 88 && u > -100 && u < 52) zn = '台科大'; }
+  if (zn && zn !== S.zone && S.mode === 'play') banner(zn);
+  S.zone = zn;
+  if (bannerT > 0) { bannerT -= dt; if (bannerT <= 0) $('banner').classList.remove('show'); }
+  if (Math.floor(S.time*4) !== Math.floor((S.time-dt)*4)) renderStats();
+  $('lockhint').classList.toggle('hide', !(S.mode === 'play' && !S.locked && !userPaused && !TEST && S.time > 1));
+  if (S.mode === 'play') {
+    const need = userPaused && !TEST, showing = !$('pause').classList.contains('hide');
+    if (need && !showing) overlay('pause'); else if (!need && showing) overlay(null);
+  }
+}
+
+const introFrom = new THREE.Vector3(60, 260, -10), introLook = new THREE.Vector3(86, 180, -68);
+const introMid = new THREE.Vector3(-60, 40, 36), introEnd = new THREE.Vector3(-60, 2.6, 46), introLookEnd = new THREE.Vector3(-60, 3, 58);
+let introFading = false;
+function frame() {
+  requestAnimationFrame(frame);
+  const dt = Math.min(clock.getDelta(), .05);
+  updateWorld(dt);
+  if (S.mode === 'intro') {
+    introT += dt;
+    const sm = x => { x = clamp(x, 0, 1); return x*x*(3-2*x); };
+    const f1 = sm(introT/3), f2 = sm((introT-3)/1.6);
+    if (introT < 3) { cam.position.lerpVectors(introFrom, introMid, f1); cam.lookAt(new THREE.Vector3().lerpVectors(introLook, introLookEnd, f1)); }
+    else { cam.position.lerpVectors(introMid, introEnd, f2); cam.lookAt(introLookEnd); }
+    if (introT > 4.6 && !introFading) { introFading = true; $('fade').classList.add('on'); setTimeout(() => { introDone(); $('fade').classList.remove('on'); }, 450); }
+  } else if (S.mode !== 'title') {
+    const paused = S.mode === 'play' && userPaused && !TEST;
+    if (!paused) {
+      if (S.mode === 'play' || S.mode === 'dialog') updatePlayer(dt);
+      if (S.mode === 'play' || S.room === 'train') updateTraps(dt);
+      if (S.mode === 'sleep') updateSleep(dt);
+      else if (S.mode !== 'end') { lightT += 0; }
+      if (S.mode !== 'end' && S.mode !== 'dead') S.time += dt;
+    }
+    updateCamera(dt);
+    updateHUD(dt);
+  } else {
+    const a = performance.now()/9000;
+    cam.position.set(86 + Math.sin(a)*120, 60, -68 + Math.cos(a)*120); cam.lookAt(86, 80, -68);
+  }
+  renderer.render(scene, cam);
+}
+function bake() {
+  scene.updateMatrixWorld(true);
+  const groups = new Map(), victims = [];
+  for (const top of [...scene.children]) {
+    if (!(top.isMesh ? !top.userData.dyn : top.isGroup && top.userData.static)) continue;
+    const ns = !!top.userData.noShadow;
+    top.traverse(o => {
+      if (!o.isMesh || Array.isArray(o.material) || !o.geometry.attributes.uv) return;
+      const geo = o.geometry.clone().applyMatrix4(o.matrixWorld);
+      for (const k of Object.keys(geo.attributes)) if (!['position','normal','uv'].includes(k)) geo.deleteAttribute(k);
+      const key = o.material.uuid + (ns ? 'n' : '') + (o.geometry.index ? 'i' : '');
+      if (!groups.has(key)) groups.set(key, {m:o.material, ns, geos:[]});
+      groups.get(key).geos.push(geo); victims.push(o);
+    });
+  }
+  for (const o of victims) o.parent.remove(o);
+  for (const {m, ns, geos} of groups.values()) {
+    const g = mergeGeometries(geos, false); if (!g) continue;
+    const mesh = new THREE.Mesh(g, m); mesh.matrixAutoUpdate = false;
+    mesh.castShadow = !ns && !m.transparent && m.type !== 'MeshBasicMaterial'; mesh.receiveShadow = m.type !== 'MeshBasicMaterial';
+    scene.add(mesh);
+  }
+  scene.children.filter(o => o.isGroup && o.userData.static && !o.children.some(c => c.isMesh || c.isGroup)).forEach(o => scene.remove(o));
+}
+bake();
+resetTraps();
+frame();
+if (TEST) window.__g = {S, T, P, player, TASKS, die, respawn, interact, keys, complete, introDone, nextLine, LEG,
+  setYaw:v => yaw = v, getYaw:() => yaw, setLight:v => lightT = v, green:() => pedGreen(),
+  sim(sec) { for (let t=0; t<sec; t+=1/60) { updateWorld(1/60); if (S.mode==='play'||S.mode==='dialog') updatePlayer(1/60); if (S.mode==='play'||S.room==='train') updateTraps(1/60); if (S.mode==='sleep') updateSleep(1/60); S.time += 1/60; updateHUD(1/60); } updateCamera(0); }};
+</script>
+</body>
+</html>
