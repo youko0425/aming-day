@@ -972,14 +972,14 @@ function talkNPC(n) {
 }
 
 // ======================= 下午篇：公館 → 台科大 =======================
-const GX = -600, GZ = 0;
+const GX = -1000, GZ = 0, CS = .3;
 const gp = (x, z) => [GX + x, GZ + z];
 const KU0 = [1100/Math.hypot(1100, 1000), -1000/Math.hypot(1100, 1000)], KN = [-KU0[1], KU0[0]];
 const KC0 = gp(190, 70), CO = [KC0[0] + KN[0]*15, KC0[1] + KN[1]*15];
 const cw = (u, v) => [CO[0] - KU0[0]*u + KN[0]*v, CO[1] - KU0[1]*u + KN[1]*v];
-const cpx = (px, py) => cw((px - 880)*.13, (1000 - py)*.13);
+const cpx = (px, py) => cw((px - 880)*CS, (1000 - py)*CS);
 const CANG = Math.atan2(KU0[1], -KU0[0]);
-const T4DOOR = cpx(620, 828);
+const T4DOOR = cpx(620, 772.5), DN = [-KN[0], -KN[1]];
 const LEG = [gp(0,0), gp(115,-19), KC0, CO, T4DOOR];
 const RD = [50/Math.hypot(50, 220), 220/Math.hypot(50, 220)], RE = [RD[1], -RD[0]], RC = gp(-22, 0);
 const rw = (t, o) => [RC[0] + RD[0]*t + RE[0]*o, RC[1] + RD[1]*t + RE[1]*o];
@@ -1022,9 +1022,7 @@ function hall(p, w, d, h, ang, name, m=ntuMat, signCol='#7a2a1a') {
     const s2 = s.clone(); s2.rotation.y = ang; s2.position.set(p[0] - nx*(d/2 + .05), 3.4, p[1] - nz*(d/2 + .05)); scene.add(s2); }
 }
 {
-  const g = new THREE.Mesh(new THREE.PlaneGeometry(520, 380), mat(0x8fa27a)); g.rotation.x = -Math.PI/2; g.position.set(GX + 160, .005, GZ + 40); scene.add(g);
-  solid(GX - 65, GX - 60, GZ - 120, GZ + 210, 6); solid(GX + 385, GX + 390, GZ - 120, GZ + 210, 6);
-  solid(GX - 65, GX + 390, GZ - 125, GZ - 120, 6); solid(GX - 65, GX + 390, GZ + 210, GZ + 215, 6);
+  const g = new THREE.Mesh(new THREE.PlaneGeometry(760, 600), mat(0x8fa27a)); g.rotation.x = -Math.PI/2; g.position.set(GX + 250, .005, GZ + 80); scene.add(g);
   const asph = mat(0x4a4c52), side = mat(0xb8aca0), white = mat(0xf0f0ea);
   // 羅斯福路與公館站
   strip(rw(-120, 0), rw(140, 0), 46, side, .015); strip(rw(-120, 0), rw(140, 0), 28, asph, .02);
@@ -1080,6 +1078,14 @@ function hall(p, w, d, h, ang, name, m=ntuMat, signCol='#7a2a1a') {
     rbox(x, z, 3, 1.4, .9, a2, mat(0xf0f0f0)); const tent = rbox(x, z, 3.4, 2.4, .1, a2, mat([0xd84a3a,0x3a8ad8,0x4ab86a,0xe8b020][k]), false, 2.6);
     for (const [dx, dz] of [[-1.6,-1.1],[1.6,-1.1],[-1.6,1.1],[1.6,1.1]]) { const pl = new THREE.Mesh(new THREE.CylinderGeometry(.04, .04, 2.6, 5), mat(0xaaaaaa)); pl.position.set(x + dx*Math.cos(a2) + dz*Math.sin(a2), 1.3, z - dx*Math.sin(a2) + dz*Math.cos(a2)); scene.add(pl); }
     const s = sign(['熱舞社','吉他社','動漫社','登山社'][k], ['#d84a3a','#3a8ad8','#4ab86a','#d89a20'][k], x, 2.2, z, a2 + Math.PI/2, {scale:.35}); }
+  // 樹籬（台大校內只能走路上）
+  { const hm = mat(0x3f6e34), hz = (a, b) => { const L = Math.hypot(b[0]-a[0], b[1]-a[1]); rbox((a[0]+b[0])/2, (a[1]+b[1])/2, L, .9, .95, Math.atan2(-(b[1]-a[1]), b[0]-a[0]), hm); };
+    const L0 = Math.hypot(LEG[1][0]-LEG[0][0], LEG[1][1]-LEG[0][1]);
+    hz(along(0, 3, 11.6), along(0, L0 - 1, 11.6)); hz(along(0, 3, -11.6), along(0, 89, -11.6)); hz(along(0, 95, -11.6), along(0, L0 - 1, -11.6));
+    hz(along(0, 89, -11.6), along(0, 89, -24)); hz(along(0, 95, -11.6), along(0, 95, -24));
+    hz(along(1, 1, 11.6), along(1, 100, 11.6)); hz(along(1, 1, -11.6), along(1, 60, -11.6));
+    hz(along(1, 60, -11.6), along(1, 60, -24.5)); hz(along(1, 60, -24.5), along(1, 104, -24.5));
+    strip(along(0, 92, -5), along(0, 92, -27), 4.4, mat(0xb07a5a), .03); }
   // 醉月湖
   { const [lx, lz] = along(0, 92, -42);
     const lake = new THREE.Mesh(new THREE.CircleGeometry(16, 28), new THREE.MeshLambertMaterial({color:0x5a8aa8})); lake.rotation.x = -Math.PI/2; lake.position.set(lx, .05, lz); scene.add(lake);
@@ -1092,16 +1098,16 @@ function hall(p, w, d, h, ang, name, m=ntuMat, signCol='#7a2a1a') {
   const KC = LEG[2], kAng = Math.atan2(-KU[1], KU[0]);
   const kp = (t, off) => [KC[0] + KU[0]*t - KU[1]*off, KC[1] + KU[1]*t + KU[0]*off];
   window.__K = {KU, KC, kp};
-  strip(kp(-150, 0), kp(150, 0), 30, side, .02); strip(kp(-150, 0), kp(150, 0), 24, asph, .035);
-  for (const o of [-.15, .15]) strip(kp(-150, o), kp(150, o), .12, mat(0xe0c040), .04);
-  for (let t=-148; t<150; t+=8) for (const o of [-6, 6]) strip(kp(t, o), kp(t + 4, o), .12, white, .04);
+  strip(kp(-170, 0), kp(270, 0), 30, side, .02); strip(kp(-170, 0), kp(270, 0), 24, asph, .035);
+  for (const o of [-.15, .15]) strip(kp(-170, o), kp(270, o), .12, mat(0xe0c040), .04);
+  for (let t=-168; t<270; t+=8) for (const o of [-6, 6]) strip(kp(t, o), kp(t + 4, o), .12, white, .04);
   for (let k=-5; k<=5; k++) strip(kp(-2.5, k*2.1), kp(2.5, k*2.1), 1, white, .045);
-  rbox(...kp(0, 0), 300, 12, 1, kAng, mat(0x9a9ea4), false, 9);
-  for (let t=-140; t<150; t+=18) if (Math.abs(t) > 6) rbox(...kp(t, 0), 1.6, 1.6, 9, kAng, mat(0x9a9ea4));
-  for (const s of [-1, 1]) for (const [t1, t2] of [[-150, -4], [4, 150]]) rbox(...kp((t1+t2)/2, s*12.3), t2 - t1, .3, 1.2, kAng, mat(0x8890a8, {metalness:.5}));
+  rbox(...kp(50, 0), 440, 12, 1, kAng, mat(0x9a9ea4), false, 9);
+  for (let t=-158; t<270; t+=18) if (Math.abs(t) > 6) rbox(...kp(t, 0), 1.6, 1.6, 9, kAng, mat(0x9a9ea4));
+  for (const s of [-1, 1]) for (const [t1, t2] of [[-170, -4], [4, 270]]) rbox(...kp((t1+t2)/2, s*12.3), t2 - t1, .3, 1.2, kAng, mat(0x8890a8, {metalness:.5}));
   { const [sx, sz] = kp(-6, 14.5); street('基隆路四段', 'Keelung Rd., Sec. 4', sx, 3.2, sz, kAng); }
   // 台科大（依照校園平面配置圖）
-  { const cplane = (x1, y1, x2, y2, c, y=.03) => { const [cx, cz] = cpx((x1+x2)/2, (y1+y2)/2); const m = new THREE.Mesh(new THREE.PlaneGeometry((x2-x1)*.13, (y2-y1)*.13), mat(c)); m.rotation.order = 'YXZ'; m.rotation.set(-Math.PI/2, CANG, 0); m.position.set(cx, y, cz); scene.add(m); return m; };
+  { const cplane = (x1, y1, x2, y2, c, y=.03) => { const [cx, cz] = cpx((x1+x2)/2, (y1+y2)/2); const m = new THREE.Mesh(new THREE.PlaneGeometry((x2-x1)*CS, (y2-y1)*CS), mat(c)); m.rotation.order = 'YXZ'; m.rotation.set(-Math.PI/2, CANG, 0); m.position.set(cx, y, cz); scene.add(m); return m; };
     const cfence = (x1, y1, x2, y2) => { const a = cpx(x1, y1), b = cpx(x2, y2), L = Math.hypot(b[0]-a[0], b[1]-a[1]); rbox((a[0]+b[0])/2, (a[1]+b[1])/2, L, .3, 1.4, Math.atan2(-(b[1]-a[1]), b[0]-a[0]), mat(0x6a6e74)); };
     cplane(115, 330, 1275, 1000, 0xd4cec2, .02);
     cfence(115, 1000, 855, 1000); cfence(905, 1000, 1275, 1000); cfence(1275, 1000, 1275, 330); cfence(1275, 330, 115, 330); cfence(115, 330, 115, 1000);
@@ -1109,7 +1115,7 @@ function hall(p, w, d, h, ang, name, m=ntuMat, signCol='#7a2a1a') {
     cplane(240, 855, 480, 970, 0xb8463a); cplane(285, 878, 435, 948, 0x6a9a4a, .035);
     cplane(228, 780, 345, 850, 0x8a6a4a); cplane(360, 780, 475, 850, 0x3a7a5a); cplane(270, 675, 380, 750, 0xc8a878); cplane(210, 480, 345, 550, 0x5a9ac8);
     const NM = [ntustMat, new THREE.MeshLambertMaterial({color:0xd8d4cc}), new THREE.MeshLambertMaterial({color:0x8a9aa0}), new THREE.MeshLambertMaterial({color:0xb8a890})];
-    const B = (x1, y1, x2, y2, h, name, m=0) => hall(cpx((x1+x2)/2, (y1+y2)/2), (x2-x1)*.13, (y2-y1)*.13, h, CANG, name, NM[m], '#2a3a5a');
+    const B = (x1, y1, x2, y2, h, name, m=0) => hall(cpx((x1+x2)/2, (y1+y2)/2), (x2-x1)*CS, (y2-y1)*CS, h, CANG, name, NM[m], '#2a3a5a');
     B(510, 775, 730, 822, 24, 'T4 第四教學大樓');
     B(510, 830, 545, 975, 20, 'T1 第一教學大樓');
     B(550, 905, 690, 985, 22, 'RB 綜合研究大樓', 3); B(690, 835, 775, 985, 16, '圖書館', 3); B(580, 840, 640, 885, 8, 'AU 視聽館', 1);
@@ -1124,11 +1130,34 @@ function hall(p, w, d, h, ang, name, m=ntuMat, signCol='#7a2a1a') {
       const gm = cpx(880, 1002); rbox(gm[0], gm[1], 7.6, .8, .9, CANG, mat(0x3a3e44), false, 3.6);
       const s1 = sign('國立臺灣科技大學', '#2a3a5a', gm[0] - KN[0]*.45, 4.05, gm[1] - KN[1]*.45, CANG, {scale:.42});
       const gs = cpx(925, 990); rbox(gs[0], gs[1], 2.4, 2, 2.6, CANG, mat(0xd8d4cc)); }
-    { const dn = T4DOOR, fa = Math.atan2(-KN[0], -KN[1]);
-      const dr = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.6), new THREE.MeshLambertMaterial({color:0x9fd0e8, transparent:true, opacity:.75})); dr.position.set(dn[0] + KN[0]*.72, 1.3, dn[1] + KN[1]*.72); dr.rotation.y = fa; scene.add(dr);
-      const ent = sign('入口　T4 第四教學大樓', '#1c5fb8', dn[0] + KN[0]*.7, 3.2, dn[1] + KN[1]*.7, fa, {scale:.4});
-      const can = rbox(dn[0] + KN[0]*.2, dn[1] + KN[1]*.2, 5, 2.2, .2, CANG, mat(0x8a8e94), false, 2.8); }
-    for (const [x, y] of [[790, 860], [790, 990], [970, 990], [500, 750], [470, 990], [1000, 790], [1240, 560], [1240, 760], [140, 600], [180, 990], [420, 760], [790, 520], [970, 520], [800, 740], [960, 740]]) tree(...cpx(x, y), 1.2);
+    { const dn = T4DOOR, fa = Math.atan2(-DN[0], -DN[1]);
+      const dr = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.6), new THREE.MeshLambertMaterial({color:0x9fd0e8, transparent:true, opacity:.75})); dr.position.set(dn[0] + DN[0]*.72, 1.3, dn[1] + DN[1]*.72); dr.rotation.y = fa; scene.add(dr);
+      const ent = sign('入口　T4 第四教學大樓', '#1c5fb8', dn[0] + DN[0]*.7, 3.2, dn[1] + DN[1]*.7, fa, {scale:.4});
+      const can = rbox(dn[0] + DN[0]*.2, dn[1] + DN[1]*.2, 5, 2.2, .2, CANG, mat(0x8a8e94), false, 2.8); }
+    const PAVE = canvasTex(128, 128, g => { g.fillStyle = '#c9c3b8'; g.fillRect(0,0,128,128); g.fillStyle = '#b8b1a5'; for (let y=0; y<128; y+=32) for (let x=(y/32%2)*32; x<128; x+=64) g.fillRect(x, y, 64, 32); g.strokeStyle = '#a49c90'; g.lineWidth = 2; for (let y=0; y<=128; y+=32) { g.beginPath(); g.moveTo(0, y); g.lineTo(128, y); g.stroke(); } for (let y=0; y<128; y+=32) for (let x=(y/32%2)*32; x<=128; x+=64) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y+32); g.stroke(); } });
+    PAVE.wrapS = PAVE.wrapT = THREE.RepeatWrapping;
+    cplane(805, 835, 975, 1000, 0xc8c0b4, .025);
+    for (let y=845; y<1000; y+=18) cplane(805, y, 975, y + 1.2, 0xb0a698, .028);
+    for (const [x1, y1, x2, y2] of [[520, 744, 1235, 772], [776, 470, 804, 1000], [960, 470, 980, 775], [530, 467, 1235, 487], [526, 470, 548, 744], [1197, 400, 1235, 985], [150, 760, 520, 780], [150, 467, 530, 482]]) {
+      const [cx, cz] = cpx((x1+x2)/2, (y1+y2)/2), w = (x2-x1)*CS, h = (y2-y1)*CS, t = PAVE.clone(); t.needsUpdate = true; t.repeat.set(w/3, h/3);
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshLambertMaterial({map:t})); m.rotation.order = 'YXZ'; m.rotation.set(-Math.PI/2, CANG, 0); m.position.set(cx, .03, cz); scene.add(m);
+    }
+    const lamp = (px, py) => { const [x, z] = cpx(px, py); const pl = new THREE.Mesh(new THREE.CylinderGeometry(.07, .1, 4.6, 6), mat(0x4a4e54)); pl.position.set(x, 2.3, z); scene.add(pl);
+      const hd = new THREE.Mesh(new THREE.BoxGeometry(.5, .16, .3), mat(0x4a4e54)); hd.position.set(x, 4.6, z); scene.add(hd); solid(x-.15, x+.15, z-.15, z+.15, 4); };
+    for (let x=580; x<1200; x+=150) lamp(x, 741);
+    for (let y=520; y<990; y+=150) lamp(807, y);
+    for (let y=850; y<995; y+=36) { tree(...cpx(812, y), 1.1); tree(...cpx(968, y), 1.1); }
+    for (let x=825; x<950; x+=32) { tree(...cpx(x, 512), 1.2); tree(...cpx(x, 733), 1.2); }
+    for (let y=540; y<720; y+=36) { tree(...cpx(812, y), 1.2); tree(...cpx(953, y), 1.2); }
+    for (const [x, y] of [[500, 750], [470, 990], [1240, 560], [1240, 760], [140, 600], [180, 990], [420, 760], [1255, 420], [1255, 900], [500, 470]]) tree(...cpx(x, y), 1.2);
+    { const cols = [0xe0e0e0, 0x2a2a2a, 0xb02020, 0x3a6ab8, 0xd8c040, 0x6a9a6a];
+      for (let y=930; y<990; y+=4) { const bk = bike(0xf0a020); const [bx, bz] = cpx(818, y); bk.position.set(bx, 0, bz); bk.rotation.y = CANG; bk.userData.static = true; scene.add(bk); }
+      { const [x, z] = cpx(822, 900); sign('YouBike 2.0', '#f0a020', x, 1.8, z, CANG + Math.PI/2, {scale:.35, fg:'#222'}); }
+      { const a = cpx(818, 930), b = cpx(818, 990); rsolid((a[0]+b[0])/2, (a[1]+b[1])/2, 1.4, Math.hypot(b[0]-a[0], b[1]-a[1]), CANG, 1); } }
+    for (const k of [-1, 0, 1]) { const [x, z] = cpx(880 + k*14, 848); const fp = new THREE.Mesh(new THREE.CylinderGeometry(.06, .08, 9, 6), mat(0xd8d8d8, {metalness:.6})); fp.position.set(x, 4.5, z); scene.add(fp);
+      const fl = new THREE.Mesh(new THREE.PlaneGeometry(1.8, 1.1), new THREE.MeshLambertMaterial({color:[0x2a5aa8, 0xc0392b, 0x2a7a4a][k+1], side:THREE.DoubleSide})); fl.position.set(x + Math.cos(CANG)*.95, 8.3, z - Math.sin(CANG)*.95); fl.rotation.y = CANG; scene.add(fl); solid(x-.15, x+.15, z-.15, z+.15, 9); }
+    for (const [x, y] of [[840, 870], [920, 870], [840, 960], [920, 960]]) { const [bx, bz] = cpx(x, y); rbox(bx, bz, 1.8, .5, .45, CANG, mat(0x8a6a4a)); }
+    for (const [x, y, c] of [[860, 900, 0x3a5a8a], [905, 930, 0xd06a3a], [650, 758, 0x6a9a6a], [1050, 760, 0x8a3a6a], [790, 620, 0x2a2a2a], [700, 478, 0xe0e0e0], [940, 880, 0xb04a6a]]) { const pp = person({shirt:c, hair:0x2a1a10}); const [x2, z2] = cpx(x, y); pp.position.set(x2, 0, z2); pp.rotation.y = rand(0, 6); scene.add(pp); }
   }
 }
 // 管理學院前的鳥
@@ -1171,7 +1200,7 @@ const GOOSE_HOME = along(0, 92, -26);
 const KCARS = [];
 for (let i=0; i<10; i++) {
   const dir = i%2 ? 1 : -1, c = i < 6 ? makeCar([0xf2c230,0xe0e0e0,0x303030,0x2050a0,0x9a9aa0,0xf2c230][i], false) : rider([0xe8e8e8, 0x2a2a2a, 0xb02020, 0x2a5aa0][i-6]);
-  c.userData = {dir, t:rand(-140, 140), off:dir > 0 ? -(i < 6 ? 3.5 : 9.5) : (i < 6 ? 3.5 : 9.5), v:rand(10, 14), cur:0, hw:i < 6 ? 2.4 : 1.1}; KCARS.push(c);
+  c.userData = {dir, t:rand(-160, 260), off:dir > 0 ? -(i < 6 ? 3.5 : 9.5) : (i < 6 ? 3.5 : 9.5), v:rand(10, 14), cur:0, hw:i < 6 ? 2.4 : 1.1}; KCARS.push(c);
 }
 const KWAVE = [];
 for (let i=0; i<12; i++) { const c = rider([0xe8e8e8, 0x2a2a2a, 0xb02020, 0x2a5aa0, 0xd8d0c0][i%5]); c.visible = false; c.userData = {o:-10 + (i%6)*3.8, row:Math.floor(i/6)}; KWAVE.push(c); }
@@ -1267,7 +1296,7 @@ const TASKS = [
   {key:'home', label:'回家交差', door:[-60,57], cp:[-60,54,Math.PI], wp:[[-25,-9.5],[-69,-9.5],[-69,10],[-60,13],[-60,56]], hidden:true},
   {key:'mrt', label:'市政府站：搭捷運去公館', door:[30,11.2], cp:[...rw(5.5, 18.2), Math.atan2(-RD[0], -RD[1])], wp:[[-60,13],[-22,10],[-22,37],[4,37],[4,10],[30,10.5]], pm:true},
   {key:'ntust', label:'走到台科大跟朋友會合', door:cpx(880, 960), cp:[...cpx(880, 975), Math.atan2(KN[0], KN[1])], wp:[LEG[0], LEG[1], LEG[2], LEG[3], cpx(880, 960)], pm:true},
-  {key:'class', label:'T4 第四教學大樓：上課', door:T4DOOR, wp:[cpx(880, 900), cpx(800, 852), cpx(640, 848), T4DOOR], pm:true}
+  {key:'class', label:'T4 第四教學大樓：上課', door:T4DOOR, wp:[cpx(880, 900), cpx(790, 880), cpx(790, 758), cpx(640, 758), T4DOOR], pm:true}
 ];
 const HOME_CP = [-60, 54, Math.PI];
 const ZONES = [
@@ -1624,7 +1653,7 @@ function sitChen() {
   startChen();
 }
 function exitRoom() {
-  const cp = {cvs:TASKS[0].cp, mkt:TASKS[1].cp, chen:TASKS[3].cp, home:HOME_CP, class:[T4DOOR[0] - KN[0]*2, T4DOOR[1] - KN[1]*2, Math.atan2(-KN[0], -KN[1])]}[S.room];
+  const cp = {cvs:TASKS[0].cp, mkt:TASKS[1].cp, chen:TASKS[3].cp, home:HOME_CP, class:[T4DOOR[0] - DN[0]*2, T4DOOR[1] - DN[1]*2, Math.atan2(-DN[0], -DN[1])]}[S.room];
   S.room = null; const [x, z, a] = cp;
   player.position.set(x, 0, z); player.rotation.y = a; yaw = a + Math.PI; pitch = .32;
 }
@@ -2010,8 +2039,20 @@ function introDone() {
 const clock = new THREE.Clock();
 const ray = new THREE.Ray(), tmpV = new THREE.Vector3(), hit = new THREE.Vector3();
 
+function inG(x, z) {
+  { const dx = x - RC[0], dz = z - RC[1], t = dx*RD[0] + dz*RD[1], o = dx*RE[0] + dz*RE[1]; if (t > -115 && t < 135 && o > -16.6 && o < 22.2) return true; }
+  const p = {x, z}, s0 = segInfo(LEG[0], LEG[1], p), s1 = segInfo(LEG[1], LEG[2], p);
+  if (s0.t > -2 && s0.t < s0.L + 2 && Math.abs(s0.off) < 11.2) return true;
+  if (s0.t > 89.4 && s0.t < 94.6 && s0.off < 0 && s0.off > -27) return true;
+  { const [lx, lz] = along(0, 92, -42); if (Math.hypot(x - lx, z - lz) < 19) return true; }
+  if (s1.t > -2 && s1.t < s1.L + 2 && s1.off < 11.2 && s1.off > (s1.t > 60.4 && s1.t < 104 ? -24 : -11.2)) return true;
+  { const K = window.__K, dx = x - K.KC[0], dz = z - K.KC[1], t = dx*K.KU[0] + dz*K.KU[1], o = -dx*K.KU[1] + dz*K.KU[0]; if (Math.abs(t) < 30 && Math.abs(o) < 15.5) return true; }
+  { const dx = x - CO[0], dz = z - CO[1], v = dx*KN[0] + dz*KN[1], u = -(dx*KU0[0] + dz*KU0[1]); if (v > -1 && v < 200 && u > -229 && u < 117) return true; }
+  return false;
+}
 function collide(nx, nz) {
   const r = .4;
+  if (nx < -300 && !S.room && !inG(nx, nz)) return true;
   for (const s of solids) if (nx > s.x1-r && nx < s.x2+r && nz > s.z1-r && nz < s.z2+r && P.y < s.h) return true;
   for (const s of rsolids) { const dx = nx - s.cx, dz = nz - s.cz, lx = dx*s.c - dz*s.s, lz = dx*s.s + dz*s.c; if (Math.abs(lx) < s.hw + r && Math.abs(lz) < s.hd + r && P.y < s.h) return true; }
   return false;
@@ -2232,7 +2273,7 @@ function updateTraps(dt) {
       if (U.wt > L + 20) { U.st = 'done'; SUS.forEach(g => g.visible = false); susBub.visible = false; $('sub').classList.add('hide'); }
     }
     if (S.stage === 6 && Math.hypot(FR[0][0] - p.x, FR[0][1] - p.z) < 6) meetFriends();
-    doorArrow.visible = S.stage === 7; if (doorArrow.visible) doorArrow.position.set(T4DOOR[0] - KN[0]*1.5, 4.6 + Math.sin(performance.now()/250)*.25, T4DOOR[1] - KN[1]*1.5);
+    doorArrow.visible = S.stage === 7; if (doorArrow.visible) doorArrow.position.set(T4DOOR[0] - DN[0]*1.5, 4.6 + Math.sin(performance.now()/250)*.25, T4DOOR[1] - DN[1]*1.5);
     // 管理學院前的鳥
     const s1 = segInfo(LEG[1], LEG[2], p);
     const underTrees = S.stage === 6 && s1.t > 50 && s1.t < 96 && Math.abs(s1.off) < 7;
@@ -2309,7 +2350,7 @@ function updateKCars(dt) {
     const u = c.userData; let v = u.v;
     if (g2) { const ahead = (-6*u.dir - u.t)*u.dir; if (ahead > 0 && ahead < 10) v = Math.max(0, v*Math.min(1, (ahead-1)/9)); }
     u.cur += (v - u.cur)*Math.min(1, dt*3); u.t += u.cur*u.dir*dt;
-    if (u.t > 150) u.t = -150; if (u.t < -150) u.t = 150;
+    if (u.t > 270) u.t = -170; if (u.t < -170) u.t = 270;
     const [x, z] = KK.kp(u.t, u.off); c.position.set(x, 0, z); c.rotation.y = Math.atan2(-KK.KU[1], KK.KU[0]) + (u.dir < 0 ? Math.PI : 0);
     if (S.mode === 'play' && Math.hypot(x - player.position.x, z - player.position.z) < (u.hw > 2 ? 2.2 : 1.1)) die('基隆路闖紅燈', '被基隆路上的車撞到');
   }
@@ -2365,7 +2406,7 @@ function updateHUD(dt) {
   const p = player.position;
   const z = ZONES.find(([n, x1, x2, z1, z2]) => p.x > x1 && p.x < x2 && p.z > z1 && p.z < z2);
   let zn = z ? z[0] : '';
-  { const dx = p.x - CO[0], dz = p.z - CO[1], v = dx*KN[0] + dz*KN[1], u = -(dx*KU0[0] + dz*KU0[1]); if (v > 0 && v < 88 && u > -100 && u < 52) zn = '台科大'; }
+  { const dx = p.x - CO[0], dz = p.z - CO[1], v = dx*KN[0] + dz*KN[1], u = -(dx*KU0[0] + dz*KU0[1]); if (v > 0 && v < 205 && u > -232 && u < 120) zn = '台科大'; }
   if (zn && zn !== S.zone && S.mode === 'play') banner(zn);
   S.zone = zn;
   if (bannerT > 0) { bannerT -= dt; if (bannerT <= 0) $('banner').classList.remove('show'); }
@@ -2406,7 +2447,7 @@ function frame() {
     const a = performance.now()/9000;
     cam.position.set(86 + Math.sin(a)*120, 60, -68 + Math.cos(a)*120); cam.lookAt(86, 80, -68);
   }
-  renderer.render(scene, cam);
+  regionView(); renderer.render(scene, cam);
 }
 function bake() {
   scene.updateMatrixWorld(true);
@@ -2418,20 +2459,29 @@ function bake() {
       if (!o.isMesh || Array.isArray(o.material) || !o.geometry.attributes.uv) return;
       const geo = o.geometry.clone().applyMatrix4(o.matrixWorld);
       for (const k of Object.keys(geo.attributes)) if (!['position','normal','uv'].includes(k)) geo.deleteAttribute(k);
-      const key = o.material.uuid + (ns ? 'n' : '') + (o.geometry.index ? 'i' : '');
-      if (!groups.has(key)) groups.set(key, {m:o.material, ns, geos:[]});
+        geo.computeBoundingBox(); const rg = REG((geo.boundingBox.min.x + geo.boundingBox.max.x)/2);
+      const key = o.material.uuid + (ns ? 'n' : '') + (o.geometry.index ? 'i' : '') + rg;
+      if (!groups.has(key)) groups.set(key, {m:o.material, ns, rg, geos:[]});
       groups.get(key).geos.push(geo); victims.push(o);
     });
   }
   for (const o of victims) o.parent.remove(o);
-  for (const {m, ns, geos} of groups.values()) {
+  for (const {m, ns, rg, geos} of groups.values()) {
     const g = mergeGeometries(geos, false); if (!g) continue;
-    const mesh = new THREE.Mesh(g, m); mesh.matrixAutoUpdate = false;
+    const mesh = new THREE.Mesh(g, m); mesh.matrixAutoUpdate = false; mesh.userData.rg = rg;
     mesh.castShadow = !ns && !m.transparent && m.type !== 'MeshBasicMaterial'; mesh.receiveShadow = m.type !== 'MeshBasicMaterial';
     scene.add(mesh);
   }
   scene.children.filter(o => o.isGroup && o.userData.static && !o.children.some(c => c.isMesh || c.isGroup)).forEach(o => scene.remove(o));
+  const keep = [window.__sky, window.__mtn, sun, sun.target, player, momP, azhe, xhui];
+  for (const o of scene.children) {
+    if (keep.includes(o) || o.isLight) continue;
+    const rg = o.userData.rg || (o.position.x === 0 && o.position.z === 0 ? 0 : REG(o.position.x));
+    if (rg) o.traverse(c => c.layers.set(rg));
+  }
 }
+function REG(x) { return x < -300 ? 2 : x > 200 ? 3 : 1; }
+function regionView() { const m = 1 | (1 << (S.room ? 3 : REG(player.position.x))); cam.layers.mask = m; sun.shadow.camera.layers.mask = m; }
 bake();
 resetTraps();
 frame();
